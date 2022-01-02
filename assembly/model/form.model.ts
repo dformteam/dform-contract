@@ -4,6 +4,7 @@ import { FormAnalysistStorage, FormStorage, ParticipantFormStorage, UserFormStor
 import { ParticipantAnswerIndexStorage } from "../storage/participant.storage";
 import { QuestionStorage, FormQuestionStorage } from "../storage/question.storage";
 import { Participant } from "./participant.model";
+import PublishForm from "./publish_form.model";
 import Question from "./question.model";
 import { QuestionType } from "./question.model";
 
@@ -13,10 +14,14 @@ class Form {
     private owner: string;
     private q_counter: i32;
     private q_participant: i32;
+    private question: Map<string, Question>;
     constructor(private title: string, private description: string) {
         this.q_counter = 0;
         this.q_participant = 0;
         this.owner = Context.sender;
+        if (this.question == null) {
+            this.question = new Map();
+        }
         this.generateId();
     }
 
@@ -70,7 +75,8 @@ class Form {
         if (this.owner == sender) {
             this.q_counter += 1;
             const newQuest = new Question(type, title, meta, this.id);
-            newQuest.save();
+            this.question.set(newQuest.getId(), newQuest);
+            // newQuest.save();
             this.save();
             return newQuest;
         }
@@ -110,7 +116,7 @@ class Form {
     }
 
     toString(): string {
-        return `{id: ${this.id}, owner: ${this.owner},q_counter: ${this.q_counter.toString()}}`;
+        return `{id: ${this.id}, owner: ${this.owner},q_counter: ${this.q_counter.toString()}, question: ${this.question.values()}}`;
     }
 
     incParticipant(userId: string): void {
@@ -120,6 +126,14 @@ class Form {
             this.save();
         }
     }
+
+    publish(limit_participants: u32, enroll_fee: u128, start_date: u64, end_date: u64): PublishForm {
+        const publishForm = new PublishForm(this.id, limit_participants, enroll_fee, start_date, end_date);
+        publishForm.save();
+        return publishForm;
+    }
+
+    publicAsATemplate(): void {}
 }
 
 export default Form;

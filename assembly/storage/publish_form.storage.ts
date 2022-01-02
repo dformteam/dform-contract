@@ -1,10 +1,11 @@
 import { PersistentUnorderedMap } from "near-sdk-as";
 import PublishForm from "../model/publish_form.model";
 
+const userPublishFormIndexPersistent = new PersistentUnorderedMap<string, u32>("uPFIP");
 const userPublishFormPersistent = new PersistentUnorderedMap<string, string>("uPFP");
 const publishFormPersistent = new PersistentUnorderedMap<string, PublishForm>("pFP");
 
-class PublishFormStorage {
+export class PublishFormStorage {
     static get(userId: string, formId: string): PublishForm | null {
         const id = `${userId}_${formId}`;
         if (publishFormPersistent.contains(id)) {
@@ -42,6 +43,8 @@ class PublishFormStorage {
             if (userPublishFormPersistent.contains(userId)) {
                 userFormSerialized = userPublishFormPersistent.getSome(userId);
                 const userForms = userFormSerialized.split(";");
+                const lastIndex = userForms.length;
+                userPublishFormIndexPersistent.set(id, lastIndex);
                 userForms.push(formId);
                 userFormSerialized = userForms.join(";");
             }
@@ -49,5 +52,27 @@ class PublishFormStorage {
         }
 
         publishFormPersistent.set(id, value);
+    }
+
+    static delete(userId: string, formId: string): void {
+        const id = `${userId}_${formId}`;
+        let index = -1;
+        
+        if (userPublishFormIndexPersistent.contains(id)) {
+            index = userPublishFormIndexPersistent.getSome(id);
+            userPublishFormIndexPersistent.delete(id);
+        }
+
+        if (index != -1 && userPublishFormPersistent.contains(userId)) {
+            let userFormSerialized = userPublishFormPersistent.getSome(userId);
+            const userForms = userFormSerialized.split(";");
+            userForms.splice(index, 1);
+            userFormSerialized = userForms.join(";");
+            userPublishFormPersistent.set(userId, userFormSerialized);
+        }
+
+        if (publishFormPersistent.contains(id)) {
+            publishFormPersistent.delete(id);
+        }
     }
 }

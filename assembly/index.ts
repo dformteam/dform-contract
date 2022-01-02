@@ -10,8 +10,8 @@ import { QuestionType } from "./model/question.model";
 import { PersistentVector } from "near-sdk-core";
 import { UserAnswer } from "./model/answer.model";
 
-export function init_new_form(title: string): string | null {
-    return Form.init_new_form(title);
+export function init_new_form(title: string, description: string): string | null {
+    return Form.init_new_form(title, description);
 }
 
 export function get_form(id: string): FormModel | null {
