@@ -5,14 +5,27 @@ import { QuestionType } from "./question.model";
 
 @nearBindgen
 export class UserAnswer {
-    constructor(private qId: string, private title: string, private type: QuestionType, private answer: string) {}
+    private participantId: string;
+    private answers: Map<string, Answer>;
+    constructor(question_id: string, title: string, type: QuestionType, answer: string) {
+        this.participantId = Context.sender;
+    }
+
+    setAnswer(formId: string, questionId: string, answer: string): void {
+        const answ = new Answer(formId, questionId, answer);
+        this.answers.set(questionId, answ);
+    }
+
+    getAnswer(): void {}
 }
 
 @nearBindgen
 class Answer {
     private owner: string;
+    private submitTime: u64;
     constructor(private formId: string, private questionId: string, private ans: string) {
         this.owner = Context.sender;
+        this.submitTime = Context.blockTimestamp;
     }
 
     save(): void {

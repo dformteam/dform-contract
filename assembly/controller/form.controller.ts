@@ -4,11 +4,11 @@ import Form from "../model/form.model";
 import { QuestionType } from "../model/question.model";
 import { FormStorage, ParticipantFormStorage, UserFormStorage } from "../storage/form.storage";
 
-export function init_new_form(title: string): string | null {
+export function init_new_form(title: string, description: string): string | null {
     if (title == "") {
         return null;
     }
-    const newForm = new Form(title, '');
+    const newForm = new Form(title, description);
     newForm.save();
     return newForm.getId();
 }
