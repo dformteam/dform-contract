@@ -8,7 +8,7 @@ export function init_new_form(title: string): string | null {
     if (title == "") {
         return null;
     }
-    const newForm = new Form(title);
+    const newForm = new Form(title, '');
     newForm.save();
     return newForm.getId();
 }
