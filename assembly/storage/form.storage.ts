@@ -1,11 +1,14 @@
 import { logging, PersistentUnorderedMap, PersistentVector } from "near-sdk-as";
 import Form from "../model/form.model";
+import { Participant } from "../model/participant.model";
 import Question from "../model/question.model";
 
 const userFormPersit = new PersistentUnorderedMap<string, string>("uFP");
 const participantFormPersit = new PersistentUnorderedMap<string, string>("pFP");
 const formPersit = new PersistentUnorderedMap<string, Form>("fP");
 const formAnalysis = new PersistentUnorderedMap<string, PersistentVector<string>>("fA");
+const participantDetailPersit = new PersistentUnorderedMap<string, Participant>("pFP");
+
 
 export class FormStorage {
     static get(id: string): Form | null {
@@ -184,5 +187,30 @@ export class ParticipantFormStorage {
             return true;
         }
         return false;
+    }
+}
+
+export class ParticipantDetailStorage {
+    static get(id: string): Participant | null {
+        if (participantDetailPersit.contains(id)) {
+            return participantDetailPersit.getSome(id);
+        }
+        return null;
+    }
+
+    static set(id: string, value: Participant): void {
+        participantDetailPersit.set(id, value);
+    }
+
+    static gets(): Participant[] {
+        return participantDetailPersit.values();
+    }
+
+    static contains(id: string): bool {
+        return participantDetailPersit.contains(id);
+    }
+
+    static delete(id: string): void {
+        participantDetailPersit.delete(id);
     }
 }

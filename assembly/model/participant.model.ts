@@ -1,39 +1,38 @@
 import { Context, logging } from "near-sdk-core";
+import { u128 } from "near-sdk-as";
 import { FormStorage } from "../storage/form.storage";
-import { FormQuestionStorage } from "../storage/question.storage";
-import { ParticipantAnswerIndexStorage } from "../storage/participant.storage";
-import Question from "./question.model";
+// import { FormQuestionStorage } from "../storage/question.storage";
+// import { ParticipantAnswerIndexStorage } from "../storage/participant.storage";
+import { ParticipantStatus } from "../helper/status.helper";
+// import Question from "./question.model";
+import { ParticipantDetailStorage } from "../storage/form.storage";
 
 @nearBindgen
 export class Participant {
-    static get_cur_ans_index(userId: string, formId: string): i32 {
-        const form = FormStorage.get(formId);
-        if (form == null) {
-            return -1;
-        }
-
-        const cIndex = ParticipantAnswerIndexStorage.get(userId, formId);
-        return cIndex;
+    public lastSubmitTimestamp: u64;
+    public cashSpent: u128 = u128.from(0);
+    public submitTime: u32 = 0;
+    public status: ParticipantStatus = ParticipantStatus.Active;
+    constructor(public formId: string, public userId: string) {
+        this.save()
     }
 
-    static get_next_question(userId: string, formId: string): Question | null {
-        const form = FormStorage.get(formId);
-        if (form == null) {
-            return null;
-        }
-
-        let cIndex = ParticipantAnswerIndexStorage.get(userId, formId);
-        const nIndex = cIndex + 1;
-        const questions = FormQuestionStorage.gets(formId);
-        const questions_length = questions.length;
-        if (questions_length - 1 < nIndex) {
-            return null;
-        }
-
-        return questions[nIndex];
+    updateStatus(status: ParticipantStatus): ParticipantStatus {
+        this.status = status;
+        this.save();
+        return this.status;
     }
 
-    static set_current_ans_index(userId: string, formId: string, cIndex: i32): void {
-        ParticipantAnswerIndexStorage.set(userId, formId, cIndex);
+    join(): u64 {
+        this.lastSubmitTimestamp = Context.blockTimestamp;
+        this.submitTime = this.submitTime + 1;
+        this.cashSpent = u128.add(this.cashSpent, Context.attachedDeposit);
+        this.save();
+        return this.lastSubmitTimestamp;
     }
+
+    save(): void {
+        ParticipantDetailStorage.set(`${this.formId}_${this.userId}`, this);
+    }
+
 }
