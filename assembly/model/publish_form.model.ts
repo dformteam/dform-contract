@@ -52,7 +52,7 @@ class PublishForm {
         //                 continue;
         //             }
         //             const answer = anw[1];
-        //             ret.add(new UserAnswer(question_id, question_detail.getTitle(), question_detail.getType(), answer));
+        //             ret.add(new UserAnswer(question_id, question_detail.get_title(), question_detail.get_type(), answer));
         //         }
         //     }
         //     return ret.values();

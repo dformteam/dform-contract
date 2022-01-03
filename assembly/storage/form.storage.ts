@@ -108,7 +108,7 @@ export class UserFormStorage {
             const formIdLengths = formIds.length;
             let num = 0;
             for (let i = 0; i < formIdLengths; i++) {
-                if (formIds[i] != '') {
+                if (formIds[i] != "") {
                     num++;
                 }
             }

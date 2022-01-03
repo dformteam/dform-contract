@@ -57,18 +57,18 @@ export class PublishFormStorage {
     static delete(userId: string, formId: string): void {
         const id = `${userId}_${formId}`;
         let index = -1;
-        
+
         if (userPublishFormIndexPersistent.contains(id)) {
             index = userPublishFormIndexPersistent.getSome(id);
             userPublishFormIndexPersistent.delete(id);
         }
 
         if (index != -1 && userPublishFormPersistent.contains(userId)) {
-            let userFormSerialized = userPublishFormPersistent.getSome(userId);
-            const userForms = userFormSerialized.split(";");
+            let userPublishFormSerialized = userPublishFormPersistent.getSome(userId);
+            const userForms = userPublishFormSerialized.split(";");
             userForms.splice(index, 1);
-            userFormSerialized = userForms.join(";");
-            userPublishFormPersistent.set(userId, userFormSerialized);
+            userPublishFormSerialized = userForms.join(";");
+            userPublishFormPersistent.set(userId, userPublishFormSerialized);
         }
 
         if (publishFormPersistent.contains(id)) {
