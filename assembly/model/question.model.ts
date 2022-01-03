@@ -1,5 +1,4 @@
 import { base58, Context, util } from "near-sdk-core";
-import { FormQuestionStorage, QuestionStorage } from "../storage/question.storage";
 
 export enum QuestionType {
     YESNO,
@@ -12,24 +11,22 @@ export enum QuestionType {
 class Question {
     private id: string;
     private owner: string;
-    constructor(private type: QuestionType, private title: string, private meta: string, private formId: string) {
+    constructor(private type: QuestionType, private title: string, private meta: string, private formId: string, private isRequired: bool) {
         this.owner = Context.sender;
-        this.generateId(formId);
+        this.generate_id(formId);
     }
 
-    private generateId(formId: string): void {
+    private generate_id(formId: string): void {
         let questionId: string = "";
         while (questionId == "") {
             const blockTime = formId + Context.blockTimestamp.toString();
             const hBlockTime = base58.encode(util.stringToBytes(blockTime));
-            if (!QuestionStorage.contains(hBlockTime)) {
-                questionId = hBlockTime;
-            }
+            questionId = hBlockTime;
         }
         this.id = questionId;
     }
 
-    getId(): string {
+    get_id(): string {
         return this.id;
     }
 
@@ -37,49 +34,32 @@ class Question {
         return this.formId;
     }
 
-    getTitle(): string {
+    get_title(): string {
         return this.title;
     }
 
-    getOwner(): string {
+    get_owner(): string {
         return this.owner;
     }
 
-    getType(): QuestionType {
+    get_type(): QuestionType {
         return this.type;
     }
 
-    updateTitle(newTitle: string): void {
-        const sender = Context.sender;
-        if (newTitle != "" && newTitle != null && newTitle != this.title && this.owner == sender) {
+    set_title(newTitle: string): void {
+        if (newTitle != "" && newTitle != null && newTitle != this.title) {
             this.title = newTitle;
         }
     }
 
-    updateMeta(newMeta: string): void {
-        const sender = Context.sender;
-        if (newMeta != "" && newMeta != null && newMeta != this.meta && this.owner == sender) {
+    set_meta(newMeta: string): void {
+        if (newMeta != "" && newMeta != null && newMeta != this.meta) {
             this.meta = newMeta;
         }
     }
 
-    save(): void {
-        QuestionStorage.set(this.id, this);
-        FormQuestionStorage.set(this.formId, this.id);
-    }
-
-    remove(): void {
-        QuestionStorage.delete(this.id);
-        FormQuestionStorage.delete(this.formId, this.id);
-    }
-
     toString(): string {
         return `{id: ${this.id}, owner: ${this.owner},q_counter: ${this.title}, title: ${this.title}, meta:${this.meta}}`;
-    }
-
-    static delete(formId: string, questionId: string): i32 {
-        QuestionStorage.delete(questionId);
-        return FormQuestionStorage.delete(formId, questionId);
     }
 }
 

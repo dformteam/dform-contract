@@ -10,7 +10,7 @@ export function init_new_form(title: string, description: string): string | null
     }
     const newForm = new Form(title, description);
     newForm.save();
-    return newForm.getId();
+    return newForm.get_id();
 }
 
 export function get_form(id: string): Form | null {
@@ -26,13 +26,15 @@ export function get_form_count(userId: string): i32 {
     return UserFormStorage.count(userId);
 }
 
-export function update_form(id: string, title: string): Form | null {
+export function update_form(id: string, title: string, description: string): Form | null {
     const sender = Context.sender;
     const existedForm = FormStorage.get(id);
-    if (existedForm == null || existedForm.getOwner() != sender) {
+    if (existedForm == null || existedForm.get_owner() != sender) {
         return null;
     }
-    existedForm.updateTitle(title);
+
+    existedForm.set_title(title);
+    existedForm.set_description(description);
     existedForm.save();
     return existedForm;
 }
@@ -40,7 +42,7 @@ export function update_form(id: string, title: string): Form | null {
 export function delete_form(id: string): bool {
     const sender = Context.sender;
     const existedForm = FormStorage.get(id);
-    if (existedForm == null || existedForm.getOwner() != sender) {
+    if (existedForm == null || existedForm.get_owner() != sender) {
         return false;
     }
     existedForm.remove();

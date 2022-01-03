@@ -1,6 +1,5 @@
 import * as Form from "./controller/form.controller";
 import * as Question from "./controller/question.controller";
-import * as Analysis from "./controller/analysis.controller";
 import * as Answer from "./controller/answer.controller";
 
 import { PaginationResult } from "./helper/pagination.helper";
@@ -22,12 +21,12 @@ export function get_forms(userId: string, page: i32): PaginationResult<FormModel
     return Form.get_forms(userId, page);
 }
 
-export function new_question(formId: string, type: QuestionType, title: string, meta: string): QuestionModel | null {
-    return Question.new_question(formId, type, title, meta);
+export function new_question(formId: string, type: QuestionType, title: string, meta: string, isRequired: bool): QuestionModel | null {
+    return Question.new_question(formId, type, title, meta, isRequired);
 }
 
-export function delete_question(id: string): bool {
-    return Question.delete_question(id);
+export function delete_question(formId: string, id: string): bool {
+    return Question.delete_question(formId, id);
 }
 
 export function get_question(userId: string, formId: string): QuestionModel | null {
@@ -46,35 +45,16 @@ export function get_form_count(userId: string): i32 {
     return Form.get_form_count(userId);
 }
 
-export function getFormTitle(formId: string): string | null {
-    return Analysis.getFormTitle(formId);
-}
-
-export function getNumOfQuestions(formId: string): i32 {
-    return Analysis.getNumOfQuestions(formId);
-}
-
-export function getListParticipants(formId: string): PersistentVector<string> | null {
-    return Analysis.getListParticipants(formId);
-}
-
-export function getParticipantResult(formId: string, participantId: string): UserAnswer[] | null {
-    return Analysis.getParticipantResult(formId, participantId);
-}
-
-export function getNumOfParticipant(formId: string): i32 {
-    return Analysis.getNumOfParticipant(formId);
-}
 export function submit_answer(formId: string, questionId: string, answer: string): bool {
     return Answer.submit_answer(formId, questionId, answer);
 }
 
-export function update_question(id: string, title: string, meta: string): QuestionModel | null {
-    return Question.update_question(id, title, meta);
+export function update_question(formId: string, id: string, title: string, meta: string): QuestionModel | null {
+    return Question.update_question(formId, id, title, meta);
 }
 
-export function update_form(id: string, title: string): FormModel | null {
-    return Form.update_form(id, title);
+export function update_form(id: string, title: string, description: string): FormModel | null {
+    return Form.update_form(id, title, description);
 }
 
 export function delete_form(id: string): bool {

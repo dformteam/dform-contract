@@ -27,13 +27,8 @@ export function pagination<T>(args: T[], page: i32): PaginationResult<T> {
     const startIndex = min(args.length - 1, args.length - (page - 1) * PAGE_SIZE - 1);
     const endIndex = max(0, startIndex - PAGE_SIZE + 1);
 
-    logging.log(args.length);
-    logging.log(startIndex);
-    logging.log(endIndex);
-
     let resultDatas = new Set<T>();
     for (let i = startIndex; i >= endIndex; i--) {
-        logging.log(i);
         resultDatas.add(args[i]);
     }
     return new PaginationResult(page, args.length, resultDatas.values());
