@@ -1,10 +1,11 @@
 import { base58, Context, util } from "near-sdk-core";
 import { u128 } from "near-sdk-as";
-import { pagination, PaginationResult } from "../helper/pagination.helper";
+import { PAGE_SIZE, pagination, PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
 import { Participant } from "../model/participant.model";
 import { QuestionType } from "../model/question.model";
 import { FormStorage, ParticipantDetailStorage, ParticipantFormStorage, UserFormStorage } from "../storage/form.storage";
+import { ParticipantStatus } from "../helper/status.helper";
 
 export function init_new_form(title: string, description: string): string | null {
     if (title == "") {
@@ -74,4 +75,47 @@ export function join_form(formId: string): Participant | null {
     if (!participant) return null;
     participant.join();
     return participant;
+}
+
+export function get_participant_detail(formId: string, userId: string): Participant | null {
+    const participantId = `${formId}_${userId}`;
+    return ParticipantDetailStorage.get(participantId);
+}
+
+export function get_participants_detail(formId: string, page: i32): PaginationResult<Participant> | null {
+    const participantsId = ParticipantFormStorage.get(formId);
+    if (!participantsId) return null;
+    let participantsDetail: Participant[] = [];
+    let minRange = page * PAGE_SIZE;
+    let maxRange = page * PAGE_SIZE + PAGE_SIZE;
+    if (maxRange <= participantsId.length) {
+        for (let i = minRange; i < maxRange; i++) {
+            let participantDetailId = formId.concat(participantsId[i]);
+            let participant: Participant | null = ParticipantDetailStorage.get(participantDetailId);
+            if (participant) {
+                participantsDetail.push(participant);
+            }
+        }
+    }
+    return pagination<Participant>(participantsDetail, page);
+}
+
+export function update_participant_status(formId: string, userId: string, status: ParticipantStatus): Participant | null {
+    const participantId = `${formId}_${userId}`;
+    let participant: Participant | null = ParticipantDetailStorage.get(participantId);
+    if (!participant) return null;
+    participant.updateStatus(status);
+    return participant;
+}
+
+export function get_enroll_fee(formId: string): u128 | null {
+    let form: Form | null = FormStorage.get(formId);
+    if (!form) return null;
+    return form.get_enroll_fee();
+}
+
+export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
+    let form: Form | null = FormStorage.get(formId);
+    if (!form) return null;
+    return form.set_enroll_fee(new_fee);
 }

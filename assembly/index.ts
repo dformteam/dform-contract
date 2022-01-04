@@ -8,6 +8,10 @@ import QuestionModel from "./model/question.model";
 import { QuestionType } from "./model/question.model";
 import { PersistentVector } from "near-sdk-core";
 import { UserAnswer } from "./model/answer.model";
+import { Participant } from "./model/participant.model";
+import { ParticipantStatus } from "./helper/status.helper";
+
+import { u128 } from "near-sdk-as";
 
 export function init_new_form(title: string, description: string): string | null {
     return Form.init_new_form(title, description);
@@ -67,4 +71,28 @@ export function get_answer_statistical(userId: string, formId: string, page: i32
 
 export function get_participants(formId: string, page: i32): PaginationResult<string> {
     return Form.get_participants(formId, page);
+}
+
+export function join_form(formId: string): Participant | null {
+    return Form.join_form(formId);
+}
+
+export function get_participant_detail(formId: string, userId: string): Participant | null {
+    return Form.get_participant_detail(formId, userId);
+}
+
+export function get_participants_detail(formId: string, page: i32): PaginationResult<Participant> | null {
+    return Form.get_participants_detail(formId, page);
+}
+
+export function update_participant_status(formId: string, userId: string, status: ParticipantStatus): Participant | null {
+    return Form.update_participant_status(formId, userId, status);
+}
+
+export function get_enroll_fee(formId: string): u128 | null {
+    return Form.get_enroll_fee(formId);
+}
+
+export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
+    return Form.set_enroll_fee(formId, new_fee);
 }

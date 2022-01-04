@@ -9,11 +9,13 @@ near call mtoan2111.testnet get_question '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBD
 near call mtoan2111.testnet get_forms '{"page": 1}' --account-id mtoan2111.testnet --gas=300000000000000
 near view mtoan2111.testnet get_form_count '{"userId": "mtoan2111.testnet"}' --account-id mtoan2111.testnet
 
-near call neutrino.testnet init_new_form '{\"title\": \"test_dep\"}' --account-id neutrino.testnet
-near call neutrino.testnet get_form '{\"id\": \"qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK\"}' --account-id neutrino.testnet
-near call neutrino.testnet new_question '{\"formId\": \"qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK\", \"type\": 1, \"title\": \"q_test2222333\", \"meta\": \"123123; 3123123\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_question '{\"formId\": \"qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK\", \"index\": 1}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet init_new_form '{\"title\": \"test_dep\", \"description\":\"formtest\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_form '{\"id\": \"C1tbALg81eAv864kXLhRtnboYtGYAs9e57CSHYY19XPZVagS\"}' --account-id neutrino.testnet
+near call neutrino.testnet new_question '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAs9e57CSHYY19XPZVagS\", \"type\": 1, \"title\": \"q_test2222333\", \"meta\": \"123123; 3123123\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_question '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAs9e57CSHYY19XPZVagS\", \"index\": 1}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet get_forms '{"page": 1}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet join_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAs9e57CSHYY19XPZVagS\"}' --account-id neutrino.testnet --deposit 1 --gas=300000000000000
+
 
 near call neutrino.testnet getFormTitle '{\"formId\": \"qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK\"}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet getNumOfQuestions '{\"formId\": \"qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK\"}' --account-id neutrino.testnet --gas=300000000000000

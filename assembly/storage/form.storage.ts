@@ -7,8 +7,8 @@ const userFormPersit = new PersistentUnorderedMap<string, string>("uFP");
 const participantFormPersit = new PersistentUnorderedMap<string, string>("pFP");
 const formPersit = new PersistentUnorderedMap<string, Form>("fP");
 const formAnalysis = new PersistentUnorderedMap<string, PersistentVector<string>>("fA");
-const participantDetailPersit = new PersistentUnorderedMap<string, Participant>("pFP");
-
+const participantDetailPersit = new PersistentUnorderedMap<string, Participant>("pDP");
+const participantsDetailStorage = new PersistentUnorderedMap<string, PersistentVector<string>>("psDP");
 
 export class FormStorage {
     static get(id: string): Form | null {
@@ -200,10 +200,6 @@ export class ParticipantDetailStorage {
 
     static set(id: string, value: Participant): void {
         participantDetailPersit.set(id, value);
-    }
-
-    static gets(): Participant[] {
-        return participantDetailPersit.values();
     }
 
     static contains(id: string): bool {

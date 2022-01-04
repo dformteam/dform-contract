@@ -1,6 +1,6 @@
 import { logging } from "near-sdk-core";
 
-const PAGE_SIZE = 5;
+export const PAGE_SIZE = 5;
 
 @nearBindgen
 export class PaginationResult<T> {
