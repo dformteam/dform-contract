@@ -107,6 +107,10 @@ class Form {
     }
 
     get_next_question(userId: string): Question | null {
+        if (this.status != FORM_STATUS.STARTING){
+            return null;
+        }
+
         if (this.answers.has(userId)) {
             const anws = this.answers.get(userId);
             const qAnsweredId = anws.keys();
@@ -198,6 +202,11 @@ class Form {
 
     submit_answer(userId: string, questionId: string, answers: string): bool {
         const current_timestamp = Context.blockTimestamp;
+        // Check start_date < current_timestamp < enddate
+        if (current_timestamp < this.start_date || current_timestamp > this.end_date) {
+            return false;
+        }
+
         if (this.answers.has(userId)) {
             const anws = this.answers.get(userId);
             const existedAnw = anws.has(questionId);

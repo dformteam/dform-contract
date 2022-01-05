@@ -45,11 +45,6 @@ export function update_question(formId: string, id: string, title: string, meta:
         return null;
     }
 
-    // const existedQuestion = QuestionStorage.get(id);
-    // if (existedQuestion == null || existedQuestion.get_owner() != sender) {
-    //     return null;
-    // }
-
     form.set_question_title(id, title);
     form.set_question_meta(id, meta);
     form.save();
@@ -81,8 +76,7 @@ export function get_questions(userId: string, formId: string, page: i32): Pagina
     if (form.get_owner() != userId) {
         return new PaginationResult(1, 0, new Array<Question>(0));
     }
-    // const questions = FormQuestionStorage.gets(formId);
-
+    
     const questions = form.get_questions();
     return pagination<Question>(questions, page);
 }
