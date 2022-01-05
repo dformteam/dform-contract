@@ -74,6 +74,7 @@ export function join_form(formId: string): Participant | null {
     let participant = ParticipantDetailStorage.get(participantId);
     if (!participant) return null;
     participant.join();
+    ParticipantFormStorage.set(sender, formId);
     return participant;
 }
 
@@ -85,19 +86,18 @@ export function get_participant_detail(formId: string, userId: string): Particip
 export function get_participants_detail(formId: string, page: i32): PaginationResult<Participant> | null {
     const participantsId = ParticipantFormStorage.get(formId);
     if (!participantsId) return null;
-    let participantsDetail: Participant[] = [];
+    let participantsDetail= new Set<Participant>();
     let minRange = page * PAGE_SIZE;
     let maxRange = page * PAGE_SIZE + PAGE_SIZE;
-    if (maxRange <= participantsId.length) {
-        for (let i = minRange; i < maxRange; i++) {
-            let participantDetailId = formId.concat(participantsId[i]);
-            let participant: Participant | null = ParticipantDetailStorage.get(participantDetailId);
-            if (participant) {
-                participantsDetail.push(participant);
-            }
+    if (participantsId.length < maxRange) maxRange = participantsId.length;
+    for (let i = minRange; i < maxRange; i++) {
+        if (!participantsId[i]) continue;
+        let participant: Participant | null = ParticipantDetailStorage.get( `${formId}_${participantsId[i]}`);
+        if (participant) {
+            participantsDetail.add(participant);
         }
     }
-    return pagination<Participant>(participantsDetail, page);
+    return new PaginationResult(page, maxRange, participantsDetail.values());
 }
 
 export function update_participant_status(formId: string, userId: string, status: ParticipantStatus): Participant | null {
