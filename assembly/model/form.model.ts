@@ -72,6 +72,12 @@ class Form {
         return this.enroll_fee;
     }
 
+    public set_enroll_fee(new_fee: u128): u128 {
+        this.enroll_fee = new_fee;
+        this.save();
+        return this.enroll_fee;
+    }
+
     public get_start_date(): u64 {
         return this.start_date;
     }
