@@ -1,28 +1,35 @@
 import { base58, Context, util } from "near-sdk-core";
+import { eq_array } from "../helper/array";
 
-export enum QuestionType {
-    YESNO,
-    ONCE,
-    MANY,
-    FILL,
+export enum ElementType {
+    HEADER,
+    SHORT,
+    LONG,
+    PHONE,
+    DATE,
+    TIME,
+    DATETIME,
+    SINGLE_CHOICE,
+    MULTI_CHOICE,
+    RATING,
+    EMAIL,
 }
 
 @nearBindgen
-class Question {
+class Element {
     private id: string;
     private owner: string;
-    constructor(private type: QuestionType, private title: string, private meta: string, private formId: string, private isRequired: bool) {
+
+    constructor(private type: ElementType, private title: string, private meta: string, private formId: string, private isRequired: bool, private nonce: i32) {
         this.owner = Context.sender;
         this.generate_id(formId);
     }
 
     private generate_id(formId: string): void {
         let elementId: string = "";
-        while (elementId == "") {
-            const blockTime = formId + Context.blockTimestamp.toString();
-            const hBlockTime = base58.encode(util.stringToBytes(blockTime));
-            elementId = hBlockTime;
-        }
+        const blockTime = `${this.owner}_${this.formId}_${this.nonce}`;
+        const hBlockTime = base58.encode(util.stringToBytes(blockTime));
+        elementId = hBlockTime;
         this.id = elementId;
     }
 
@@ -30,7 +37,7 @@ class Question {
         return this.id;
     }
 
-    getFormId(): string {
+    get_form_id(): string {
         return this.formId;
     }
 
@@ -42,7 +49,7 @@ class Question {
         return this.owner;
     }
 
-    get_type(): QuestionType {
+    get_type(): ElementType {
         return this.type;
     }
 
@@ -53,7 +60,7 @@ class Question {
     }
 
     set_meta(newMeta: string): void {
-        if (newMeta != "" && newMeta != null && newMeta != this.meta) {
+        if (this.meta != newMeta) {
             this.meta = newMeta;
         }
     }
@@ -63,4 +70,4 @@ class Question {
     }
 }
 
-export default Question;
+export default Element;

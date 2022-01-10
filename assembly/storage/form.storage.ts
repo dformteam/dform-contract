@@ -1,15 +1,12 @@
 import { logging, PersistentUnorderedMap, PersistentVector } from "near-sdk-as";
+import { getPaginationOffset, pagination, PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
 import { Participant } from "../model/participant.model";
-import Question from "../model/question.model";
+import Question from "../model/element.model";
 
 const userFormPersit = new PersistentUnorderedMap<string, string>("uFP");
-const participantFormPersit = new PersistentUnorderedMap<string, string>("pFP");
 const formPersit = new PersistentUnorderedMap<string, Form>("fP");
 const formAnalysis = new PersistentUnorderedMap<string, PersistentVector<string>>("fA");
-const participantDetailPersit = new PersistentUnorderedMap<string, Participant>("pDP");
-const participantsDetailStorage = new PersistentUnorderedMap<string, PersistentVector<string>>("psDP");
-
 export class FormStorage {
     static get(id: string): Form | null {
         if (formPersit.contains(id)) {
@@ -63,24 +60,28 @@ export class FormAnalysistStorage {
 }
 
 export class UserFormStorage {
-    static gets(id: string): Form[] {
+    static gets(id: string, page: i32): PaginationResult<Form> {
         if (userFormPersit.contains(id)) {
             const formIdSerialize = userFormPersit.getSome(id);
             if (formIdSerialize == "" || formIdSerialize == null) {
-                return new Array<Form>(0);
+                return new PaginationResult<Form>(1, 0, new Array<Form>(0));
             }
+
             const formIds = formIdSerialize.split(",");
             const formSize = formIds.length;
+            const pagination_offset = getPaginationOffset(formSize, page);
             const ret: Set<Form> = new Set<Form>();
-            for (let i = 0; i < formSize; i++) {
+
+            for (let i = pagination_offset.startIndex; i >= pagination_offset.endIndex; i--) {
                 if (formPersit.contains(formIds[i])) {
                     const formDetails = formPersit.getSome(formIds[i]);
                     ret.add(formDetails);
                 }
             }
-            return ret.values();
+            return new PaginationResult<Form>(page, formSize, ret.values());
         }
-        return new Array<Form>(0);
+
+        return new PaginationResult<Form>(1, 0, new Array<Form>(0));
     }
 
     static set(userId: string, formId: string): void {
@@ -138,75 +139,4 @@ export class UserFormStorage {
     }
 }
 
-export class ParticipantFormStorage {
-    static get(formId: string): string[] {
-        if (participantFormPersit.contains(formId)) {
-            const participantIdsSerialize = participantFormPersit.getSome(formId);
-            if (participantIdsSerialize == null || participantIdsSerialize == "") {
-                return new Array<string>(0);
-            }
 
-            const participantIds = participantIdsSerialize.split(";");
-            return participantIds;
-        }
-
-        return new Array<string>(0);
-    }
-
-    static set(userId: string, formId: string): void {
-        if (participantFormPersit.contains(formId)) {
-            let participantIdsSerialize = participantFormPersit.getSome(formId);
-            if (participantIdsSerialize == null || participantIdsSerialize == "") {
-                participantIdsSerialize = "";
-            }
-
-            const participantIds = participantIdsSerialize.split(";");
-            const pIndex = participantIds.indexOf(userId);
-            if (pIndex == -1) {
-                participantIds.push(userId);
-                participantIdsSerialize = participantIds.join(";");
-                participantFormPersit.set(formId, participantIdsSerialize);
-            }
-        } else {
-            participantFormPersit.set(formId, userId);
-        }
-    }
-
-    static contain(userId: string, formId: string): bool {
-        if (participantFormPersit.contains(formId)) {
-            let participantIdsSerialize = participantFormPersit.getSome(formId);
-            if (participantIdsSerialize == null || participantIdsSerialize == "") {
-                return false;
-            }
-
-            const participantIds = participantIdsSerialize.split(";");
-            const pIndex = participantIds.indexOf(userId);
-            if (pIndex == -1) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-}
-
-export class ParticipantDetailStorage {
-    static get(id: string): Participant | null {
-        if (participantDetailPersit.contains(id)) {
-            return participantDetailPersit.getSome(id);
-        }
-        return null;
-    }
-
-    static set(id: string, value: Participant): void {
-        participantDetailPersit.set(id, value);
-    }
-
-    static contains(id: string): bool {
-        return participantDetailPersit.contains(id);
-    }
-
-    static delete(id: string): void {
-        participantDetailPersit.delete(id);
-    }
-}

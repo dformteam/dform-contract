@@ -1,11 +1,18 @@
 import { base58, Context, u128, util, logging } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
-import { PublishFormStorage } from "../storage/publish_form.storage";
-import { UserAnswer } from "./answer.model";
-import Answer from "./answer.model";
-import PublishForm from "./publish_form.model";
-import Question from "./question.model";
+import PassedElement, { UserAnswer } from "./passed_element";
+import Answer from "./passed_element";
+import Question from "./element.model";
 import { QuestionType } from "./question.model";
+import { ElementType } from "./element.model";
+import Element from "./element.model";
+import ParticipantForm from "./participant_form.model";
+import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
+import { ElementStorage } from "../storage/element.storage";
+import { Participant } from "./participant.model";
+import { WhiteListStorage } from "../storage/white_list.storage";
+import { BlackListStorage } from "../storage/black_list.storage";
+import { PassedElementStorage } from "../storage/passed_element";
 
 export enum FORM_STATUS {
     EDITING,
@@ -22,20 +29,21 @@ class Form {
     private enroll_fee: u128;
     private start_date: u64;
     private end_date: u64;
-    private questions: Map<string, Question>;
-    private answers: Map<string, Map<string, Answer>>; // user => [qId => [, answer]
+    private elements: Set<string>;
+    private participants: Set<string>;
     private isRetry: bool = false;
+    private nonce = 0;
 
     constructor(private title: string, private description: string) {
         this.owner = Context.sender;
         this.status = FORM_STATUS.EDITING;
-        if (this.questions == null) {
-            this.questions = new Map();
+        if (this.elements == null) {
+            this.elements = new Set<string>();
         }
 
-        if (this.answers == null) {
-            this.answers = new Map();
-        }
+        // if (this.answers == null) {
+        //     this.answers = new Map();
+        // }
 
         this.generate_id();
     }
@@ -56,8 +64,8 @@ class Form {
         return this.id;
     }
 
-    public get_max_question(): i32 {
-        return this.questions.keys.length;
+    public get_max_element(): i32 {
+        return this.elements.size;
     }
 
     public get_owner(): string {
@@ -86,6 +94,22 @@ class Form {
         return this.end_date;
     }
 
+    public get_white_list(): string[] {
+        return WhiteListStorage.get(this.id);
+    }
+
+    public set_white_list(userId: string): void {
+        WhiteListStorage.set(this.id, userId);
+    }
+
+    public get_black_list(): string[] {
+        return BlackListStorage.get(this.id);
+    }
+
+    public set_black_list(userId: string): void {
+        BlackListStorage.set(this.id, userId);
+    }
+
     public get_is_retry(): bool {
         return this.isRetry;
     }
@@ -112,46 +136,77 @@ class Form {
         }
     }
 
-    get_next_question(userId: string): Question | null {
-        if (this.status != FORM_STATUS.STARTING){
+    get_next_element(userId: string): Element | null {
+        if (this.status != FORM_STATUS.STARTING) {
             return null;
         }
 
-        if (this.answers.has(userId)) {
-            const anws = this.answers.get(userId);
-            const qAnsweredId = anws.keys();
-            const questionIds = this.questions.keys();
-            const questionIds_lenth = questionIds.length;
-            if (questionIds_lenth == qAnsweredId.length) {
+        const participant_form_id = `${userId}_${this.id}`;
+
+        const participant_form = ParticipantFormStorage.get(participant_form_id);
+
+        if (participant_form != null) {
+            const element_ids = this.elements.values();
+            const element_ids_length = element_ids.length;
+
+            const participant_element_passed = participant_form.get_passed_element_keys();
+            const participant_element_passed_length = participant_element_passed.length;
+
+            if (element_ids_length == participant_element_passed_length) {
                 return null;
             }
-            for (let i = 0; i < questionIds_lenth; i++) {
-                if (!qAnsweredId.includes(questionIds[i])) {
-                    return this.questions.get(questionIds[i]);
+
+            for (let i = 0; i < element_ids_length; i++) {
+                if (!participant_element_passed.includes(element_ids[i])) {
+                    return ElementStorage.get(element_ids[i]);
                 }
             }
             return null;
-        } else if (this.questions.size > 0) {
-            return this.questions.values()[0];
+        } else if (this.elements.size > 0) {
+            const elementId = this.elements.values()[0];
+            return ElementStorage.get(elementId);
         } else {
             return null;
         }
     }
 
-    set_question_title(question_id: string, new_title: string): void {
-        const question = this.questions.get(question_id);
-        if (question == null) {
-            return;
+    get_back_element(userId: string): Element | null {
+        if (this.status != FORM_STATUS.STARTING) {
+            return null;
         }
-        question.set_title(new_title);
+
+        const participant_form_id = `${userId}_${this.id}`;
+
+        const participant_form = ParticipantFormStorage.get(participant_form_id);
+
+        if (participant_form != null) {
+            const participant_element_passed = participant_form.get_passed_element_keys();
+            const participant_element_passed_length = participant_element_passed.length;
+
+            if (participant_element_passed_length === 0) {
+                return null;
+            }
+
+            return ElementStorage.get(participant_element_passed[participant_element_passed_length - 1]);
+        } else {
+            return null;
+        }
     }
 
-    set_question_meta(question_id: string, new_meta: string): void {
-        const question = this.questions.get(question_id);
-        if (question == null) {
+    set_element_title(element_id: string, new_title: string): void {
+        const element = ElementStorage.get(element_id);
+        if (element == null) {
             return;
         }
-        question.set_meta(new_meta);
+        element.set_title(new_title);
+    }
+
+    set_element_meta(element_id: string, new_meta: string): void {
+        const element = ElementStorage.get(element_id);
+        if (element == null) {
+            return;
+        }
+        element.set_meta(new_meta);
     }
 
     save(): void {
@@ -164,25 +219,26 @@ class Form {
         UserFormStorage.delete(this.owner, this.id);
     }
 
-    add_new_question(type: QuestionType, title: string, meta: string, isRequired: bool): Question | null {
+    add_new_element(type: ElementType, title: string, meta: string, isRequired: bool): Element | null {
         const sender = Context.sender;
         if (this.owner == sender && this.status == FORM_STATUS.EDITING) {
-            const newQuest = new Question(type, title, meta, this.id, isRequired);
-            this.questions.set(newQuest.get_id(), newQuest);
+            this.nonce += 1;
+            const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce);
+            this.elements.add(newElement.get_id());
             this.save();
-            return newQuest;
+            return newElement;
         }
         return null;
     }
 
-    remove_question(id: string): bool {
+    remove_element(id: string): bool {
         const currentTimestamp = Context.blockTimestamp;
         if (this.status != FORM_STATUS.EDITING || currentTimestamp > this.start_date) {
             return false;
         }
 
-        if (this.questions.has(id)) {
-            this.questions.delete(id);
+        if (this.elements.has(id)) {
+            this.elements.delete(id);
             this.save();
             return true;
         }
@@ -198,81 +254,131 @@ class Form {
             this.end_date = 0;
             this.enroll_fee = u128.Zero;
             this.limit_participants = 0;
-            this.answers = new Map();
+            // this.answers = new Map();
             this.save();
-            PublishFormStorage.delete(this.owner, this.id);
             return true;
         }
         return false;
     }
 
-    submit_answer(userId: string, questionId: string, answers: string): bool {
+    join(): bool {
+        const sender = Context.sender;
+
+        if (!this.participants.has(sender)) {
+            const is_in_white_list = WhiteListStorage.contains(this.id, sender);
+            const is_in_black_list = BlackListStorage.contains(this.id, sender);
+
+            if (!is_in_white_list || is_in_black_list) {
+                return false;
+            }
+
+            const participants_length = this.participants.size;
+            if (this.limit_participants != 0 && participants_length >= this.limit_participants) {
+                return false;
+            }
+
+            this.participants.add(sender);
+
+            const participant = new Participant();
+            participant.join_form(this.id);
+            participant.save();
+
+            const participant_form = new ParticipantForm(this.id);
+            participant_form.save();
+            return true;
+        }
+
+        return false;
+    }
+
+    submit_answer(userId: string, elementId: string, answers: string): bool {
+        //need to join form first to create the necessary storage
+        if (!this.participants.has(userId)) {
+            return false;
+        }
+
         const current_timestamp = Context.blockTimestamp;
         // Check start_date < current_timestamp < enddate
         if (current_timestamp < this.start_date || current_timestamp > this.end_date) {
             return false;
         }
 
-        if (this.answers.has(userId)) {
-            const anws = this.answers.get(userId);
-            const existedAnw = anws.has(questionId);
-            if (this.isRetry || !existedAnw) {
-                const newAnswer = new Answer(this.id, questionId, answers);
-                anws.set(questionId, newAnswer);
-                this.save();
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            const newAnswer = new Answer(this.id, questionId, answers);
-            this.answers.set(userId, new Map<string, Answer>().set(questionId, newAnswer));
-            this.save();
+        const participant_form_id = `${userId}_${this.id}`;
+
+        const participant_form = ParticipantFormStorage.get(participant_form_id);
+
+        if (participant_form == null) {
+            return false;
+        }
+
+        const passed_element_existed = participant_form.contain_passed_element(elementId);
+
+        if (this.isRetry || !passed_element_existed) {
+            const newPassedElement = new PassedElement(elementId, answers);
+            newPassedElement.save();
+
+            participant_form.set_passed_element(elementId);
+            participant_form.save();
             return true;
+        } else {
+            return false;
         }
     }
 
     toString(): string {
-        return `{id: ${this.id}, owner: ${this.owner}, question: ${this.questions.values()}}`;
+        return `{id: ${this.id}, owner: ${this.owner}, element: ${this.elements.values()}}`;
     }
 
-    publish(limit_participants: u32, enroll_fee: u128, start_date: u64, end_date: u64): PublishForm {
-        const publishForm = new PublishForm(this.id, limit_participants, enroll_fee, start_date, end_date);
-        publishForm.save();
-        return publishForm;
-    }
+    publish(limit_participants: u32, enroll_fee: u128, start_date: u64, end_date: u64): void {}
 
     get_answer(userId: string): UserAnswer[] {
-        if (this.answers.has(userId)) {
-            const mAnws = this.answers.get(userId);
-            const nAnws_key = mAnws.keys();
-            const nAnsws_key_length = nAnws_key.length;
-            const result = new Set<UserAnswer>();
-            for (let i = 0; i < nAnsws_key_length; i++) {
-                const question_id = nAnws_key[i];
-                const question = this.questions.get(question_id);
-                if (question != null) {
-                    const anw = mAnws.get(nAnws_key[i]);
-                    const question_title = question.get_title();
-                    const question_type = question.get_type();
-                    const answer_meta = anw.get_answer();
-                    const answer_submit_time = anw.get_submit_time();
-                    result.add(new UserAnswer(question_id, question_title, question_type, answer_meta, answer_submit_time));
-                }
-            }
+        const participant_form_id = `${userId}_${this.id}`;
 
-            return result.values();
+        const participant_form = ParticipantFormStorage.get(participant_form_id);
+
+        if (participant_form == null) {
+            return new Array<UserAnswer>(0);
         }
 
-        return new Array<UserAnswer>(0);
+        const passed_element_keys = participant_form?.get_passed_element_keys();
+        const passed_element_keys_length = passed_element_keys.length;
+        const result = new Set<UserAnswer>();
+
+        for (let i = 0; i < passed_element_keys_length; i++) {
+            const passed_element = PassedElementStorage.get(passed_element_keys[i]);
+            const element = ElementStorage.get(passed_element_keys[i]);
+            if (element != null && element.get_type() != ElementType.HEADER && passed_element != null) {
+                const element_title = element.get_title();
+                const element_type = element.get_type();
+                const passed_element_content = passed_element.get_content();
+                const passed_element_submit_time = passed_element.get_submit_time();
+                result.add(new UserAnswer(element.get_id(), element_title, element_type, passed_element_content, passed_element_submit_time));
+            }
+        }
+
+        return result.values();
     }
 
-    get_questions(): Question[] {
-        return this.questions.values();
+    get_elements(): Element[] {
+        const elements_size = this.elements.size;
+        if (elements_size == 0) {
+            return new Array<Element>(0);
+        }
+
+        const elements = this.elements.values();
+        const ret = new Set<Element>();
+        for (let i = 0; i < elements_size; i++) {
+            const element = ElementStorage.get(elements[i]);
+            if (element != null) {
+                ret.add(element);
+            }
+        }
+
+        return ret.values();
     }
 
-    get_question(question_id: string): Question {
-        return this.questions.get(question_id);
+    get_element(element_id: string): Element | null {
+        return ElementStorage.get(element_id);
     }
 
     publicAsATemplate(): void {}
