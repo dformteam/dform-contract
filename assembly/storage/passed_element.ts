@@ -1,6 +1,5 @@
 import { PersistentUnorderedMap } from "near-sdk-as";
 import PassedElement from "../model/passed_element";
-import Answer from "../model/passed_element";
 
 const passedElementPersit = new PersistentUnorderedMap<string, PassedElement>("pAP");
 
@@ -21,6 +20,8 @@ export class PassedElementStorage {
     }
 
     static delete(id: string): void {
-        passedElementPersit.delete(id);
+        if (passedElementPersit.contains(id)) {
+            passedElementPersit.delete(id);
+        }
     }
 }

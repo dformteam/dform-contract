@@ -1,17 +1,15 @@
 import * as Form from "./controller/form.controller";
 import * as Question from "./controller/element.controller";
 import * as Answer from "./controller/answer.controller";
+import * as Participant from "./controller/participant.controller";
 
 import { PaginationResult } from "./helper/pagination.helper";
 import FormModel from "./model/form.model";
 import QuestionModel from "./model/element.model";
 import { ElementType } from "./model/element.model";
-import { PersistentVector } from "near-sdk-core";
 import { UserAnswer } from "./model/passed_element";
-import { Participant } from "./model/participant.model";
-import { ParticipantStatus } from "./model/participant.model";
-
 import { u128 } from "near-sdk-as";
+import { ParticipantFormResponse } from "./model/response/participant_form";
 
 export function init_new_form(title: string, description: string): string | null {
     return Form.init_new_form(title, description);
@@ -21,8 +19,24 @@ export function get_form(id: string): FormModel | null {
     return Form.get_form(id);
 }
 
+export function publish_form(formId: string, limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
+    return Form.publish_form(formId, limit_participants, enroll_fee, start_date, end_date);
+}
+
+export function unpublish_form(formId: string): bool {
+    return Form.unpublish_form(formId);
+}
+
+export function join_form(formId: string): bool {
+    return Form.join_form(formId);
+}
+
 export function get_forms(userId: string, page: i32): PaginationResult<FormModel> {
     return Form.get_forms(userId, page);
+}
+
+export function get_joined_forms(userId: string, page: i32): PaginationResult<ParticipantFormResponse> {
+    return Participant.get_joined_forms(userId, page);
 }
 
 export function new_element(formId: string, type: ElementType, title: string, meta: string, isRequired: bool): QuestionModel | null {
@@ -66,7 +80,7 @@ export function delete_form(id: string): bool {
 }
 
 export function get_answer_statistical(userId: string, formId: string, page: i32): PaginationResult<UserAnswer> {
-    return Answer.get_answer_statistical(userId, formId, page);
+    return Participant.get_answer_statistical(userId, formId, page);
 }
 
 // export function get_participants(formId: string, page: i32): PaginationResult<string> {

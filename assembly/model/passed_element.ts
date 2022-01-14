@@ -1,4 +1,5 @@
 import { Context } from "near-sdk-core";
+import { PassedElementStorage } from "../storage/passed_element";
 import { ElementType } from "./element.model";
 
 @nearBindgen
@@ -17,6 +18,7 @@ class PassedElement {
     constructor(private elementId: string, private content: string) {
         this.owner = Context.sender;
         this.submit_time = Context.blockTimestamp;
+        this.generate_answer_id();
     }
 
     generate_answer_id(): void {
@@ -35,7 +37,13 @@ class PassedElement {
         return this.id;
     }
 
-    save(): void {}
+    toString(): string {
+        return `id: ${this.id},content: ${this.content}`;
+    }
+
+    save(): void {
+        PassedElementStorage.set(this.id, this);
+    }
 }
 
 export default PassedElement;

@@ -1,18 +1,17 @@
-import { base58, Context, u128, util, logging } from "near-sdk-core";
+import { base58, Context, u128, util } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
-import PassedElement, { UserAnswer } from "./passed_element";
-import Answer from "./passed_element";
-import Question from "./element.model";
-import { QuestionType } from "./question.model";
-import { ElementType } from "./element.model";
+import { UserAnswer } from "./passed_element";
+import PassedElement from "./passed_element";
+import Participant from "./participant.model";
 import Element from "./element.model";
 import ParticipantForm from "./participant_form.model";
+import { ElementType } from "./element.model";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { ElementStorage } from "../storage/element.storage";
-import { Participant } from "./participant.model";
 import { WhiteListStorage } from "../storage/white_list.storage";
 import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
+import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 
 export enum FORM_STATUS {
     EDITING,
@@ -25,26 +24,27 @@ class Form {
     public id: string;
     private owner: string;
     private status: FORM_STATUS;
-    private limit_participants: u32;
+    private limit_participants: i32;
     private enroll_fee: u128;
     private start_date: u64;
     private end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
     private isRetry: bool = false;
-    private nonce = 0;
+    private nonce: i32 = 0;
 
     constructor(private title: string, private description: string) {
         this.owner = Context.sender;
         this.status = FORM_STATUS.EDITING;
+        this.enroll_fee = u128.Zero;
+
         if (this.elements == null) {
             this.elements = new Set<string>();
         }
 
-        // if (this.answers == null) {
-        //     this.answers = new Map();
-        // }
-
+        if (this.participants == null) {
+            this.participants = new Set<string>();
+        }
         this.generate_id();
     }
 
@@ -224,6 +224,7 @@ class Form {
         if (this.owner == sender && this.status == FORM_STATUS.EDITING) {
             this.nonce += 1;
             const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce);
+            newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
             return newElement;
@@ -247,14 +248,23 @@ class Form {
     }
 
     unpublish(): bool {
-        const currentTimestamp = Context.blockTimestamp;
-        if (this.status != FORM_STATUS.EDITING && currentTimestamp > this.end_date) {
+        const currentTimestamp = Context.blockTimestamp / 1000000;
+        if (this.status != FORM_STATUS.EDITING && currentTimestamp < this.end_date) {
             this.status = FORM_STATUS.EDITING;
             this.start_date = 0;
             this.end_date = 0;
             this.enroll_fee = u128.Zero;
             this.limit_participants = 0;
-            // this.answers = new Map();
+            const participants = this.participants.values();
+            const participant_length = participants.length;
+            for (let i = 0; i < participant_length; i++) {
+                const participant = ParticipantStorage.get(participants[i]);
+                if (participant != null) {
+                    participant.remove_form(this.id);
+                }
+            }
+
+            this.participants.clear();
             this.save();
             return true;
         }
@@ -281,10 +291,13 @@ class Form {
 
             const participant = new Participant();
             participant.join_form(this.id);
+
             participant.save();
 
             const participant_form = new ParticipantForm(this.id);
             participant_form.save();
+            this.save();
+
             return true;
         }
 
@@ -297,8 +310,7 @@ class Form {
             return false;
         }
 
-        const current_timestamp = Context.blockTimestamp;
-        // Check start_date < current_timestamp < enddate
+        const current_timestamp = Context.blockTimestamp / 1000000;
         if (current_timestamp < this.start_date || current_timestamp > this.end_date) {
             return false;
         }
@@ -329,23 +341,41 @@ class Form {
         return `{id: ${this.id}, owner: ${this.owner}, element: ${this.elements.values()}}`;
     }
 
-    publish(limit_participants: u32, enroll_fee: u128, start_date: u64, end_date: u64): void {}
+    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
+        if (this.status == FORM_STATUS.EDITING) {
+            this.start_date = start_date;
+            this.limit_participants = limit_participants;
+            this.end_date = end_date;
+            this.enroll_fee = enroll_fee;
+            this.status = FORM_STATUS.STARTING;
+            this.save();
+            return true;
+        }
+        return false;
+    }
 
-    get_answer(userId: string): UserAnswer[] {
+    get_answer(userId: string, page: i32): PaginationResult<UserAnswer> {
         const participant_form_id = `${userId}_${this.id}`;
 
         const participant_form = ParticipantFormStorage.get(participant_form_id);
 
         if (participant_form == null) {
-            return new Array<UserAnswer>(0);
+            return new PaginationResult(1, 0, new Array<UserAnswer>(0));
         }
 
-        const passed_element_keys = participant_form?.get_passed_element_keys();
+        const passed_element_keys = participant_form.get_passed_element_keys();
         const passed_element_keys_length = passed_element_keys.length;
         const result = new Set<UserAnswer>();
+        const pagination_offset = getPaginationOffset(passed_element_keys_length, page);
+        const start_index = pagination_offset.startIndex;
+        const end_index = pagination_offset.endIndex;
 
-        for (let i = 0; i < passed_element_keys_length; i++) {
-            const passed_element = PassedElementStorage.get(passed_element_keys[i]);
+        for (let i = start_index; i >= end_index; i--) {
+            const passed_element_id = `${userId}_${passed_element_keys[i]}`;
+            const passed_element = PassedElementStorage.get(passed_element_id);
+            if (passed_element == null){
+                continue;
+            }
             const element = ElementStorage.get(passed_element_keys[i]);
             if (element != null && element.get_type() != ElementType.HEADER && passed_element != null) {
                 const element_title = element.get_title();
@@ -356,7 +386,7 @@ class Form {
             }
         }
 
-        return result.values();
+        return new PaginationResult(page, passed_element_keys_length, result.values());
     }
 
     get_elements(): Element[] {

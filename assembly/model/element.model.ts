@@ -1,5 +1,6 @@
 import { base58, Context, util } from "near-sdk-core";
 import { eq_array } from "../helper/array";
+import { ElementStorage } from "../storage/element.storage";
 
 export enum ElementType {
     HEADER,
@@ -67,6 +68,10 @@ class Element {
 
     toString(): string {
         return `{id: ${this.id}, owner: ${this.owner},q_counter: ${this.title}, title: ${this.title}, meta:${this.meta}}`;
+    }
+
+    save(): void {
+        ElementStorage.set(this.id, this);
     }
 }
 

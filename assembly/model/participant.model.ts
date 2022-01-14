@@ -1,6 +1,8 @@
-import { Context, logging } from "near-sdk-core";
-import { u128 } from "near-sdk-as";
-import { ParticipantStorage } from "../storage/participant.storage";
+import { Context } from "near-sdk-core";
+import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
+import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
+import { FormStorage } from "../storage/form.storage";
+import { ParticipantFormResponse } from "../model/response/participant_form";
 
 export enum ParticipantStatus {
     Banned,
@@ -9,13 +11,16 @@ export enum ParticipantStatus {
 }
 
 @nearBindgen
-export class Participant {
+class Participant {
     private id: string;
     private status: ParticipantStatus = ParticipantStatus.Active;
     private forms: Set<string>;
 
     constructor() {
         this.id = Context.sender;
+        if (this.forms == null) {
+            this.forms = new Set<string>();
+        }
         this.save();
     }
 
@@ -35,6 +40,41 @@ export class Participant {
         return this.forms.has(formId);
     }
 
+    get_joined_form(page: i32): PaginationResult<ParticipantFormResponse> {
+        const forms = this.forms.values();
+        const forms_length = forms.length;
+        const paginationOffset = getPaginationOffset(forms_length, page);
+
+        const start_index = paginationOffset.startIndex;
+        const end_index = paginationOffset.endIndex;
+        let ret = new Set<ParticipantFormResponse>();
+        for (let i = start_index; i >= end_index; i--) {
+            const form_id = forms[i];
+            const form = FormStorage.get(form_id);
+            if (form == null) {
+                continue;
+            }
+            const participant_form_id = `${this.id}_${form_id}`;
+            const participant_form = ParticipantFormStorage.get(participant_form_id);
+
+            if (participant_form == null) {
+                continue;
+            }
+
+            const passed_question = participant_form.get_passed_question();
+            ret.add(new ParticipantFormResponse(this.id, form_id, form.get_title(), passed_question));
+        }
+        return new PaginationResult(page, forms_length, ret.values());
+    }
+
+    remove_form(form_id: string): void {
+        if (this.forms.has(form_id)) {
+            this.forms.delete(form_id);
+            const participant_form_id = `${this.id}_${form_id}`;
+            ParticipantFormStorage.delete(participant_form_id);
+            this.save();
+        }
+    }
     // join(): u64 {
     //     this.lastSubmitTimestamp = Context.blockTimestamp;
     //     this.submitTimes = this.submitTimes + 1;
@@ -47,3 +87,5 @@ export class Participant {
         ParticipantStorage.set(this.id, this);
     }
 }
+
+export default Participant;

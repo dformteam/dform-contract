@@ -1,5 +1,3 @@
-import { logging } from "near-sdk-core";
-
 export const PAGE_SIZE = 5;
 
 @nearBindgen

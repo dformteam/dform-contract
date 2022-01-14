@@ -1,10 +1,7 @@
-import { Context } from "near-sdk-core";
-import { u128 } from "near-sdk-as";
-import { PAGE_SIZE, pagination, PaginationResult } from "../helper/pagination.helper";
+import { Context, u128 } from "near-sdk-core";
+import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
-import { Participant } from "../model/participant.model";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
-import { ParticipantStatus } from "../model/participant.model";
 
 export function init_new_form(title: string, description: string): string | null {
     if (title == "") {
@@ -48,4 +45,30 @@ export function delete_form(id: string): bool {
     }
     existedForm.remove();
     return true;
+}
+
+export function join_form(formId: string): bool {
+    const existedForm = FormStorage.get(formId);
+    if (existedForm == null) {
+        return false;
+    }
+    return existedForm.join();
+}
+
+export function publish_form(formId: string, limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
+    const existedForm = FormStorage.get(formId);
+    if (existedForm == null) {
+        return false;
+    }
+    return existedForm.publish(limit_participants, enroll_fee, start_date, end_date);
+}
+
+export function unpublish_form(formId: string): bool {
+    const existedForm = FormStorage.get(formId);
+    const sender = Context.sender;
+    if (existedForm == null || existedForm.get_owner() != sender) {
+        return false;
+    }
+
+    return existedForm.unpublish();
 }

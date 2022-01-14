@@ -1,5 +1,5 @@
 import { PersistentUnorderedMap } from "near-sdk-as";
-import { Participant } from "../model/participant.model";
+import Participant from "../model/participant.model";
 import ParticipantForm from "../model/participant_form.model";
 
 const participantFormPersit = new PersistentUnorderedMap<string, ParticipantForm>("pFP");
@@ -24,7 +24,7 @@ export class ParticipantFormStorage {
 
     static delete(id: string): void {
         if (participantFormPersit.contains(id)) {
-            participantDetailPersit.delete(id);
+            participantFormPersit.delete(id);
         }
     }
 }
@@ -46,6 +46,8 @@ export class ParticipantStorage {
     }
 
     static delete(id: string): void {
-        participantDetailPersit.delete(id);
+        if (participantDetailPersit.contains(id)) {
+            participantDetailPersit.delete(id);
+        }
     }
 }

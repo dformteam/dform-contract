@@ -1,14 +1,37 @@
-import { Context, u128 } from "near-sdk-as";
-import { PAGE_SIZE, pagination, PaginationResult } from "../helper/pagination.helper";
-import Form from "../model/form.model";
-import { Participant, ParticipantStatus } from "../model/participant.model";
+import { Context } from "near-sdk-as";
+import { pagination, PaginationResult } from "../helper/pagination.helper";
+import { UserAnswer } from "../model/passed_element";
 import { FormStorage } from "../storage/form.storage";
+import { ParticipantStorage } from "../storage/participant.storage";
+import { ParticipantFormResponse } from "../model/response/participant_form";
 
 // export function get_participants(formId: string, page: i32): PaginationResult<string> {
 //     const form = FormStorage.get(formId);
 //     if (form == null) {
 //         return new PaginationResult(1, 0, new Array<string>(0));
 //     }
+
+export function get_joined_forms(userId: string, page: i32): PaginationResult<ParticipantFormResponse> {
+    const participant = ParticipantStorage.get(userId);
+
+    if (participant == null) {
+        return new PaginationResult(1, 0, new Array<ParticipantFormResponse>(0));
+    }
+
+    return participant.get_joined_form(page)
+}
+
+export function get_answer_statistical(userId: string, formId: string, page: i32): PaginationResult<UserAnswer> {
+    const sender = Context.sender;
+    const form = FormStorage.get(formId);
+    if (form == null || (form.get_owner() != sender && userId != sender)) {
+        return new PaginationResult(1, 0, new Array<UserAnswer>(0));
+    }
+
+    // const sender = Context.sender;
+    return form.get_answer(userId, page);
+    // const userAnswers = AnswerStorage.get(formId, userId);
+}
 
 //     const participants = ParticipantFormStorage.get(formId);
 //     return pagination(participants, page);
