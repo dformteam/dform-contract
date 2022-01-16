@@ -25,14 +25,14 @@ near view mtoan2111.testnet get_elements '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBD
 near call mtoan2111.testnet delete_element '{"id":"FpT3nqdVbtLzUgDivzP36FLrimTFT8xpLKmLFcnEnmaPPMS7jqsd2CMTZxWnHKd7kLqUYL9adE4zpoynW5QphCrtjJgbW"}' --account-id mtoan2111.testnet --gas=300000000000000
 
 near call neutrino.testnet init_new_form '{\"title\": \"test_dep\", \"description\":\"formtest\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_form '{\"id\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\"}' --account-id neutrino.testnet
-near call neutrino.testnet new_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"type\": 1, \"title\": \"q_test2222333\", \"meta\": \"123123; 3123123\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"index\": 1}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet join_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\"}' --account-id neutrino.testnet --deposit 1 --gas=300000000000000
-near call neutrino.testnet get_participant_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"userId\":\"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_participants_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"page\":0}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet update_participant_status '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"userId\":\"neutrino.testnet\", \"status\":0}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\"}' --account-id neutrino.testnet
-near call neutrino.testnet set_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"new_fee\": \"1000000000000000000000000\"}' --account-id neutrino.testnet
-near view neutrino.testnet get_participants '{"formId": \"C1tbALg81eAv864kXLhRtnboYtGYAvSxnAjyJhgEEVZx9NmS\", \"page\": 1}' --account-id neutrino.testnet
+near call neutrino.testnet get_form '{\"id\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\"}' --account-id neutrino.testnet
+near call neutrino.testnet new_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"type\": 2, \"title\": \"q_test2222332254_ggg33_vvbbv\", \"meta\": \"123123; 3123123\", \"isRequired\": false}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet join_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\"}' --account-id neutrino.testnet --deposit 1 --gas=300000000000000
+near call neutrino.testnet get_participant_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"userId\":\"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_participants_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"page\":0}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet update_participant_status '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"userId\":\"neutrino.testnet\", \"status\":0}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\"}' --account-id neutrino.testnet
+near call neutrino.testnet set_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"new_fee\": \"1000000000000000000000000\"}' --account-id neutrino.testnet
+near view neutrino.testnet get_participants '{"formId": \"C1tbALg81eAv864kXLhRtnboYtGfJg8TnWyRM7Y6tLA44pJu\", \"page\": 1}' --account-id neutrino.testnet
 

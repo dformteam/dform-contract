@@ -12,6 +12,7 @@ import { WhiteListStorage } from "../storage/white_list.storage";
 import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
+import { logging, env } from "near-sdk-as";
 
 export enum FORM_STATUS {
     EDITING,
@@ -32,6 +33,7 @@ class Form {
     private participants: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
+    private totalGasUsed: u128;
 
     constructor(private title: string, private description: string) {
         this.owner = Context.sender;
@@ -412,6 +414,10 @@ class Form {
     }
 
     publicAsATemplate(): void {}
+
+    updateTotalGasUsed(additionalGas: u128): u128 {
+        this.totalGasUsed
+    }
 }
 
 export default Form;

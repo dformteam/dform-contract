@@ -103,10 +103,11 @@ export function get_answer_statistical(userId: string, formId: string, page: i32
 //     return Form.update_participant_status(formId, userId, status);
 // }
 
-// export function get_enroll_fee(formId: string): u128 | null {
-//     return Form.get_enroll_fee(formId);
-// }
+export function get_enroll_fee(formId: string): u128 | null {
+    return Form.get_enroll_fee(formId);
+}
 
-// export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
-//     return Form.set_enroll_fee(formId, new_fee);
-// }
+export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
+    return Form.set_enroll_fee(formId, new_fee);
+}
+

@@ -72,3 +72,20 @@ export function unpublish_form(formId: string): bool {
 
     return existedForm.unpublish();
 }
+
+export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
+    const form = FormStorage.get(formId);
+    const sender = Context.sender;
+    if (form && sender === form.get_owner()) {
+        return form.set_enroll_fee(new_fee);
+    }
+    return null;
+}
+
+export function get_enroll_fee(formId: string): u128 | null {
+    const form = FormStorage.get(formId);
+    if (form) {
+        return form.get_enroll_fee();
+    }
+    return null;
+}
