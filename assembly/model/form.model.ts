@@ -24,6 +24,7 @@ class Form {
     public id: string;
     private owner: string;
     private status: FORM_STATUS;
+    private created_at: u64;
     private limit_participants: i32;
     private enroll_fee: u128;
     private start_date: u64;
@@ -35,6 +36,7 @@ class Form {
 
     constructor(private title: string, private description: string) {
         this.owner = Context.sender;
+        this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
 
