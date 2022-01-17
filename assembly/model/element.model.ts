@@ -1,6 +1,8 @@
 import { base58, Context, util } from "near-sdk-core";
+import { u128 } from "near-sdk-as";
 import { eq_array } from "../helper/array";
 import { ElementStorage } from "../storage/element.storage";
+import Base from "./base.model";
 
 export enum ElementType {
     HEADER,
@@ -17,11 +19,12 @@ export enum ElementType {
 }
 
 @nearBindgen
-class Element {
+class Element extends Base {
     private id: string;
     private owner: string;
 
     constructor(private type: ElementType, private title: string, private meta: string, private formId: string, private isRequired: bool, private nonce: i32) {
+        super();
         this.owner = Context.sender;
         this.generate_id(formId);
     }
@@ -71,6 +74,7 @@ class Element {
     }
 
     save(): void {
+        this.cal_storage_fee(this.id, `${this}`);
         ElementStorage.set(this.id, this);
     }
 }

@@ -1,10 +1,11 @@
 import { Context, u128 } from "near-sdk-as";
 import { ElementStorage } from "../storage/element.storage";
 import { ParticipantFormStorage } from "../storage/participant.storage";
+import Base from "./base.model";
 import { ElementType } from "./element.model";
 
 @nearBindgen
-class ParticipantForm {
+class ParticipantForm extends Base {
     private id: string;
     private lastSubmitTimestamp: u64;
     private cashSpent: u128 = u128.from(0);
@@ -12,6 +13,7 @@ class ParticipantForm {
     private passed_element: Set<string>;
 
     constructor(private formId: string) {
+        super();
         if (this.passed_element == null) {
             this.passed_element = new Set<string>();
         }
@@ -37,16 +39,16 @@ class ParticipantForm {
         return this.passed_element.values();
     }
 
-    get_passed_element_count(): i32{
+    get_passed_element_count(): i32 {
         return this.passed_element.size;
     }
 
     get_passed_question(): i32 {
         const elements = this.passed_element.values();
         let count = 0;
-        for (let i = 0; i< elements.length; i++){
+        for (let i = 0; i < elements.length; i++) {
             const element = ElementStorage.get(elements[i]);
-            if (element != null && element.get_type() != ElementType.HEADER){
+            if (element != null && element.get_type() != ElementType.HEADER) {
                 count = count + 1;
             }
         }
@@ -58,9 +60,15 @@ class ParticipantForm {
         return this.passed_element.has(id);
     }
 
+    toString(): string {
+        return `{id: ${this.id}, lastSubmitTimestamp: ${this.lastSubmitTimestamp}, cashSpent: ${this.cashSpent}, submitTimes: ${this.submitTimes}, passed_element: ${this.passed_element}}`;
+    }
+
     save(): void {
+        this.cal_storage_fee(this.id, this.toString());
         ParticipantFormStorage.set(this.id, this);
     }
+
 }
 
 export default ParticipantForm;

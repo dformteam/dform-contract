@@ -1,8 +1,10 @@
 import { Context } from "near-sdk-core";
+import { u128 } from "near-sdk-as";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { FormStorage } from "../storage/form.storage";
 import { ParticipantFormResponse } from "../model/response/participant_form";
+import Base from "./base.model";
 
 export enum ParticipantStatus {
     Banned,
@@ -11,12 +13,13 @@ export enum ParticipantStatus {
 }
 
 @nearBindgen
-class Participant {
+class Participant extends Base {
     private id: string;
     private status: ParticipantStatus = ParticipantStatus.Active;
     private forms: Set<string>;
 
     constructor() {
+        super();
         this.id = Context.sender;
         if (this.forms == null) {
             this.forms = new Set<string>();
@@ -38,6 +41,10 @@ class Participant {
 
     get_join_form_status(formId: string): bool {
         return this.forms.has(formId);
+    }
+
+    get_storage_fee(): u128 {
+        return this.storageFee;
     }
 
     get_joined_form(page: i32): PaginationResult<ParticipantFormResponse> {
@@ -83,7 +90,12 @@ class Participant {
     //     return this.lastSubmitTimestamp;
     // }
 
+    toString(): string {
+        return `{id: ${this.id}, status: ${this.status}, forms: ${this.forms}}`;
+    }
+
     save(): void {
+        this.cal_storage_fee(this.id, `${this}`)
         ParticipantStorage.set(this.id, this);
     }
 }

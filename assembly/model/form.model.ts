@@ -13,6 +13,7 @@ import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { logging, env } from "near-sdk-as";
+import Base from "./base.model";
 
 export enum FORM_STATUS {
     EDITING,
@@ -21,7 +22,7 @@ export enum FORM_STATUS {
 }
 
 @nearBindgen
-class Form {
+class Form extends Base {
     public id: string;
     private owner: string;
     private status: FORM_STATUS;
@@ -33,9 +34,9 @@ class Form {
     private participants: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
-    private totalGasUsed: u128;
 
     constructor(private title: string, private description: string) {
+        super()
         this.owner = Context.sender;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
@@ -212,6 +213,7 @@ class Form {
     }
 
     save(): void {
+        this.cal_storage_fee(this.id, this.toString());
         FormStorage.set(this.id, this);
         UserFormStorage.set(this.owner, this.id);
     }
@@ -375,7 +377,7 @@ class Form {
         for (let i = start_index; i >= end_index; i--) {
             const passed_element_id = `${userId}_${passed_element_keys[i]}`;
             const passed_element = PassedElementStorage.get(passed_element_id);
-            if (passed_element == null){
+            if (passed_element == null) {
                 continue;
             }
             const element = ElementStorage.get(passed_element_keys[i]);
@@ -413,11 +415,8 @@ class Form {
         return ElementStorage.get(element_id);
     }
 
-    publicAsATemplate(): void {}
+    publicAsATemplate(): void { }
 
-    updateTotalGasUsed(additionalGas: u128): u128 {
-        this.totalGasUsed
-    }
 }
 
 export default Form;
