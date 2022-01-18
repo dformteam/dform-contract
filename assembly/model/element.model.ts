@@ -6,16 +6,19 @@ import Base from "./base.model";
 
 export enum ElementType {
     HEADER,
-    SHORT,
-    LONG,
+    FULLNAME,
+    EMAIL,
+    ADDRESS,
     PHONE,
     DATE,
-    TIME,
-    DATETIME,
+    FILL_IN_THE_BLANK,
+    SHORT,
+    LONG,
     SINGLE_CHOICE,
     MULTI_CHOICE,
+    TIME,
     RATING,
-    EMAIL,
+    DATETIME,
 }
 
 @nearBindgen
@@ -23,7 +26,14 @@ class Element extends Base {
     private id: string;
     private owner: string;
 
-    constructor(private type: ElementType, private title: string, private meta: string, private formId: string, private isRequired: bool, private nonce: i32) {
+    constructor(
+        private type: ElementType,
+        private title: string[],
+        private meta: Set<string>,
+        private formId: string,
+        private isRequired: bool,
+        private nonce: i32,
+    ) {
         super();
         this.owner = Context.sender;
         this.generate_id(formId);
@@ -45,7 +55,7 @@ class Element extends Base {
         return this.formId;
     }
 
-    get_title(): string {
+    get_title(): string[] {
         return this.title;
     }
 
@@ -57,16 +67,12 @@ class Element extends Base {
         return this.type;
     }
 
-    set_title(newTitle: string): void {
-        if (newTitle != "" && newTitle != null && newTitle != this.title) {
-            this.title = newTitle;
-        }
+    set_title(newTitle: string[]): void {
+        this.title = newTitle;
     }
 
-    set_meta(newMeta: string): void {
-        if (this.meta != newMeta) {
-            this.meta = newMeta;
-        }
+    set_meta(newMeta: Set<string>): void {
+        this.meta = newMeta;
     }
 
     toString(): string {

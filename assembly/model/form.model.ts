@@ -26,6 +26,7 @@ class Form extends Base {
     public id: string;
     private owner: string;
     private status: FORM_STATUS;
+    private created_at: u64;
     private limit_participants: i32;
     private enroll_fee: u128;
     private start_date: u64;
@@ -38,6 +39,7 @@ class Form extends Base {
     constructor(private title: string, private description: string) {
         super()
         this.owner = Context.sender;
+        this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
 
@@ -196,7 +198,7 @@ class Form extends Base {
         }
     }
 
-    set_element_title(element_id: string, new_title: string): void {
+    set_element_title(element_id: string, new_title: string[]): void {
         const element = ElementStorage.get(element_id);
         if (element == null) {
             return;
@@ -204,7 +206,7 @@ class Form extends Base {
         element.set_title(new_title);
     }
 
-    set_element_meta(element_id: string, new_meta: string): void {
+    set_element_meta(element_id: string, new_meta: Set<string>): void {
         const element = ElementStorage.get(element_id);
         if (element == null) {
             return;
@@ -223,7 +225,7 @@ class Form extends Base {
         UserFormStorage.delete(this.owner, this.id);
     }
 
-    add_new_element(type: ElementType, title: string, meta: string, isRequired: bool): Element | null {
+    add_new_element(type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Element | null {
         const sender = Context.sender;
         if (this.owner == sender && this.status == FORM_STATUS.EDITING) {
             this.nonce += 1;
@@ -311,7 +313,7 @@ class Form extends Base {
         return null;
     }
 
-    submit_answer(userId: string, elementId: string, answers: string): bool {
+    submit_answer(userId: string, elementId: string, answers: Set<string>): bool {
         //need to join form first to create the necessary storage
         if (!this.participants.has(userId)) {
             return false;
@@ -387,7 +389,7 @@ class Form extends Base {
             if (element != null && element.get_type() != ElementType.HEADER && passed_element != null) {
                 const element_title = element.get_title();
                 const element_type = element.get_type();
-                const passed_element_content = passed_element.get_content();
+                const passed_element_content = passed_element.get_content().values();
                 const passed_element_submit_time = passed_element.get_submit_time();
                 result.add(new UserAnswer(element.get_id(), element_title, element_type, passed_element_content, passed_element_submit_time));
             }

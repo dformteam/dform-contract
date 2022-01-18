@@ -8,7 +8,7 @@ import FormModel from "./model/form.model";
 import QuestionModel from "./model/element.model";
 import { ElementType } from "./model/element.model";
 import { UserAnswer } from "./model/passed_element";
-import { u128 } from "near-sdk-as";
+import { logging, u128 } from "near-sdk-as";
 import { ParticipantFormResponse } from "./model/response/participant_form";
 
 export function init_new_form(title: string, description: string): string | null {
@@ -39,7 +39,7 @@ export function get_joined_forms(userId: string, page: i32): PaginationResult<Pa
     return Participant.get_joined_forms(userId, page);
 }
 
-export function new_element(formId: string, type: ElementType, title: string, meta: string, isRequired: bool): QuestionModel | null {
+export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
     return Question.new_element(formId, type, title, meta, isRequired);
 }
 
@@ -63,11 +63,11 @@ export function get_form_count(userId: string): i32 {
     return Form.get_form_count(userId);
 }
 
-export function submit_answer(formId: string, elementId: string, answer: string): bool {
+export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
     return Answer.submit_answer(formId, elementId, answer);
 }
 
-export function update_element(formId: string, id: string, title: string, meta: string): QuestionModel | null {
+export function update_element(formId: string, id: string, title: string[], meta: Set<string>): QuestionModel | null {
     return Question.update_element(formId, id, title, meta);
 }
 
@@ -81,6 +81,10 @@ export function delete_form(id: string): bool {
 
 export function get_answer_statistical(userId: string, formId: string, page: i32): PaginationResult<UserAnswer> {
     return Participant.get_answer_statistical(userId, formId, page);
+}
+
+export function test(title: Set<string>): void {
+    logging.log(title.values());
 }
 
 // export function get_participants(formId: string, page: i32): PaginationResult<string> {

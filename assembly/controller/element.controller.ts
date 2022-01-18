@@ -4,10 +4,11 @@ import Question from "../model/element.model";
 import { ElementType } from "../model/element.model";
 import { FormStorage } from "../storage/form.storage";
 
-export function new_element(formId: string, type: ElementType, title: string, meta: string, isRequired: bool): Question | null {
-    if (title == "") {
+export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Question | null {
+    if (title.length == 0 || title[0] == "") {
         return null;
     }
+
     const existedForm = FormStorage.get(formId);
     if (existedForm == null) {
         return null;
@@ -33,7 +34,7 @@ export function delete_element(formId: string, id: string): bool {
     return result;
 }
 
-export function update_element(formId: string, id: string, title: string, meta: string): Question | null {
+export function update_element(formId: string, id: string, title: string[], meta: Set<string>): Question | null {
     const sender = Context.sender;
     const form = FormStorage.get(formId);
 
@@ -76,7 +77,7 @@ export function get_elements(userId: string, formId: string, page: i32): Paginat
     if (form.get_owner() != userId) {
         return new PaginationResult(1, 0, new Array<Question>(0));
     }
-    
+
     const elements = form.get_elements();
     return pagination<Question>(elements, page);
 }

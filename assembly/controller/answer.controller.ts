@@ -1,7 +1,7 @@
 import { Context } from "near-sdk-core";
 import { FormStorage } from "../storage/form.storage";
 
-export function submit_answer(formId: string, elementId: string, answer: string): bool {
+export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
     const sender = Context.sender;
     const form = FormStorage.get(formId);
     if (form == null) {

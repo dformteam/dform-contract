@@ -1,5 +1,5 @@
 near call xtest3.testnet init_new_form '{"title": "test_dep", "description":"formtest"}' --account-id xtest3.testnet
-near view xtest3.testnet get_form '{"id": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K"}' --account-id xtest3.testnet
+near view xtest3.testnet get_form '{"id": "qCsqqzSCyGMNbXh3aLep8NJRntYn5i3XUfWEMi6JCGr9a1DSA"}' --account-id xtest3.testnet
 near call xtest3.testnet new_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "type": 2, "title": "q_test2222332254_ggg33_vvbbv", "meta": "123123; 3123123", "isRequired": false}' --account-id xtest3.testnet --gas=300000000000000
 near view xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest3.testnet"}' --account-id xtest3.testnet
 near call xtest3.testnet publish_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "limit_participants": 200, "enroll_fee": "0", "start_date": "1612112400000", "end_date": "1675184400000"}' --account-id xtest3.testnet
@@ -11,9 +11,11 @@ near call xtest3.testnet get_answer_statistical '{"formId": "cnPNVXssboBwGRcdzKS
 
 near view xtest3.testnet get_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
 near view xtest3.testnet get_joined_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
+near view xtest3.testnet test '{"title": ["123", "123123", "345345"]}' --account-id xtest3.testnet
+near view xtest3.testnet get_elements '{"formId": "qCsqqzSCyGMNbXh3aLep8NJRntYn5i3XUfWEMi6JCGr9a1DSA", "userId": "mtoan2193.testnet", "page": 1}' --account-id xtest3.testnet
 
 
-near call mtoan2111.testnet get_element '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBDA5gBhs7yJXj8YdmX22m9JJK", "index": 1}' --account-id mtoan2111.testnet --gas=300000000000000
+near call xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "index": 1}' --account-id xtest3.testnet --gas=300000000000000
 
 near view mtoan2111.testnet get_form_count '{"userId": "mtoan2111.testnet"}' --account-id mtoan2111.testnet
 
