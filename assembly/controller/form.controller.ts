@@ -2,9 +2,16 @@ import { Context, u128 } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
+import { ContractPromiseBatch, logging } from "near-sdk-as";
+
+const FREE_FORM_MAX_NUM_PARTICIPANTS = 50;
+const CREATE_FORM_COST = "10000000000000000000"; // 1 NEAR
 
 export function init_new_form(title: string, description: string): string | null {
     if (title == "") {
+        return null;
+    }
+    if (u128.lt(Context.attachedDeposit, u128.from(CREATE_FORM_COST))) {
         return null;
     }
     const newForm = new Form(title, description);
@@ -52,7 +59,23 @@ export function join_form(formId: string): bool {
     if (existedForm == null) {
         return false;
     }
-    return existedForm.join();
+    if (u128.lt(Context.attachedDeposit, existedForm.get_enroll_fee())) {
+        return false;
+    }
+    if (u128.eq(u128.Zero, existedForm.get_enroll_fee()) && (existedForm.get_current_num_participants() >= (FREE_FORM_MAX_NUM_PARTICIPANTS))) {
+        return false;
+    }
+    let current_storage_fee: u128 | null = existedForm.join();
+    if (!current_storage_fee) {
+        return false;
+    }
+    if (!u128.eq(u128.Zero, existedForm.get_enroll_fee()) && current_storage_fee) {
+        let withdraw_token = u128.sub(Context.attachedDeposit, current_storage_fee);
+        logging.log(`withdraw_token => ${withdraw_token}`);
+        ContractPromiseBatch.create(existedForm.get_owner()).transfer(withdraw_token);
+    }
+
+    return true;
 }
 
 export function publish_form(formId: string, limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
@@ -76,7 +99,7 @@ export function unpublish_form(formId: string): bool {
 export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
     const form = FormStorage.get(formId);
     const sender = Context.sender;
-    if (form && sender === form.get_owner()) {
+    if (form && (sender == form.get_owner())) {
         return form.set_enroll_fee(new_fee);
     }
     return null;

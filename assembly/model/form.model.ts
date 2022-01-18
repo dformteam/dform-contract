@@ -275,7 +275,7 @@ class Form extends Base {
         return false;
     }
 
-    join(): bool {
+    join(): u128 | null {
         const sender = Context.sender;
 
         if (!this.participants.has(sender)) {
@@ -283,12 +283,12 @@ class Form extends Base {
             const is_in_black_list = BlackListStorage.contains(this.id, sender);
 
             if (!is_in_white_list || is_in_black_list) {
-                return false;
+                return null;
             }
 
             const participants_length = this.participants.size;
             if (this.limit_participants != 0 && participants_length >= this.limit_participants) {
-                return false;
+                return null;
             }
 
             this.participants.add(sender);
@@ -302,10 +302,13 @@ class Form extends Base {
             participant_form.save();
             this.save();
 
-            return true;
+            let cur_participant_fee = u128.add(participant.get_storage_fee(), participant_form.get_storage_fee());
+            let total_storage_fee = u128.add(cur_participant_fee, this.get_storage_fee());
+
+            return total_storage_fee;
         }
 
-        return false;
+        return null;
     }
 
     submit_answer(userId: string, elementId: string, answers: string): bool {
@@ -413,6 +416,10 @@ class Form extends Base {
 
     get_element(element_id: string): Element | null {
         return ElementStorage.get(element_id);
+    }
+
+    get_current_num_participants(): i32 {
+        return this.participants.size;
     }
 
     publicAsATemplate(): void { }
