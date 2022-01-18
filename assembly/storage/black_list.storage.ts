@@ -32,13 +32,8 @@ export class BlackListStorage {
         }
     }
 
-    static sets(id: string, value: string): void {
-        const values = value.split(";");
-        let black_lists = new Set<string>();
-        for (let i = 0; i < values.length; i++) {
-            black_lists.add(values[i]);
-        }
-        blackListPersit.set(id, black_lists);
+    static sets(id: string, value: Set<string>): void {
+        blackListPersit.set(id, value);
     }
 
     static contains(id: string, value: string): bool {

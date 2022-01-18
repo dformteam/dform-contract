@@ -36,18 +36,16 @@ export class WhiteListStorage {
         }
     }
 
-    static sets(id: string, value: string): void {
-        const values = value.split(";");
-        let white_list = new Set<string>();
-        for (let i = 0; i < values.length; i++) {
-            white_list.add(values[i]);
-        }
-        whiteListPersit.set(id, white_list);
+    static sets(id: string, value: Set<string>): void {
+        whiteListPersit.set(id, value);
     }
 
     static contains(id: string, value: string): bool {
         if (whiteListPersit.contains(id)) {
             let white_list = whiteListPersit.getSome(id);
+            if (white_list.size == 0) {
+                return true;
+            }
 
             return white_list.has(value);
 

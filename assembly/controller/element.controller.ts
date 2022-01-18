@@ -2,6 +2,7 @@ import { Context } from "near-sdk-core";
 import { pagination, PaginationResult } from "../helper/pagination.helper";
 import Question from "../model/element.model";
 import { ElementType } from "../model/element.model";
+import { ElementStorage } from "../storage/element.storage";
 import { FormStorage } from "../storage/form.storage";
 
 export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Question | null {
@@ -34,7 +35,7 @@ export function delete_element(formId: string, id: string): bool {
     return result;
 }
 
-export function update_element(formId: string, id: string, title: string[], meta: Set<string>): Question | null {
+export function update_element(formId: string, id: string, title: string[], meta: Set<string>, isRequired: bool): Question | null {
     const sender = Context.sender;
     const form = FormStorage.get(formId);
 
@@ -46,10 +47,21 @@ export function update_element(formId: string, id: string, title: string[], meta
         return null;
     }
 
-    form.set_element_title(id, title);
-    form.set_element_meta(id, meta);
-    form.save();
-    return form.get_element(id);
+    if (!form.has_element(id)) {
+        return null;
+    }
+
+    const element = ElementStorage.get(id);
+
+    if (element == null) {
+        return null;
+    }
+
+    element.set_title(title);
+    element.set_meta(meta);
+    element.set_required(isRequired);
+    element.save();
+    return element;
 }
 
 export function get_element(userId: string, formId: string): Question | null {
