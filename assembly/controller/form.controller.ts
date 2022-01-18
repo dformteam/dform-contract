@@ -1,13 +1,15 @@
 import { Context, u128 } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
+import { FORM_TYPE } from "../model/form.model";
+import { FormStatusResponse } from "../model/response/form_status";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
 
-export function init_new_form(title: string, description: string): string | null {
+export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
     if (title == "") {
         return null;
     }
-    const newForm = new Form(title, description);
+    const newForm = new Form(title, description, type);
     newForm.save();
     return newForm.get_id();
 }
@@ -22,6 +24,15 @@ export function get_forms(userId: string, page: i32): PaginationResult<Form> {
 
 export function get_form_count(userId: string): i32 {
     return UserFormStorage.count(userId);
+}
+
+export function get_form_status(formId: string): FormStatusResponse {
+    const form = FormStorage.get(formId);
+    if (form == null) {
+        return new FormStatusResponse("", "", 0);
+    }
+
+    return new FormStatusResponse(formId, form.get_owner(), form.get_status());
 }
 
 export function update_form(id: string, title: string, description: string): Form | null {
@@ -55,12 +66,20 @@ export function join_form(formId: string): bool {
     return existedForm.join();
 }
 
-export function publish_form(formId: string, limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
+export function publish_form(
+    formId: string,
+    limit_participants: i32,
+    enroll_fee: u128,
+    start_date: u64,
+    end_date: u64,
+    black_list: Set<string>,
+    white_list: Set<string>,
+): bool {
     const existedForm = FormStorage.get(formId);
     if (existedForm == null) {
         return false;
     }
-    return existedForm.publish(limit_participants, enroll_fee, start_date, end_date);
+    return existedForm.publish(limit_participants, enroll_fee, start_date, end_date, black_list, white_list);
 }
 
 export function unpublish_form(formId: string): bool {

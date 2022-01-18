@@ -19,6 +19,11 @@ export enum FORM_STATUS {
     ENDED,
 }
 
+export enum FORM_TYPE {
+    BASIC,
+    CARD,
+}
+
 @nearBindgen
 class Form {
     public id: string;
@@ -34,7 +39,7 @@ class Form {
     private isRetry: bool = false;
     private nonce: i32 = 0;
 
-    constructor(private title: string, private description: string) {
+    constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
         this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
@@ -62,6 +67,10 @@ class Form {
         this.id = formId;
     }
 
+    public get_type(): FORM_TYPE {
+        return this.type;
+    }
+
     public get_id(): string {
         return this.id;
     }
@@ -80,6 +89,14 @@ class Form {
 
     public get_enroll_fee(): u128 {
         return this.enroll_fee;
+    }
+
+    public get_status(): FORM_STATUS {
+        return this.status;
+    }
+
+    public has_element(element_id: string): bool {
+        return this.elements.has(element_id);
     }
 
     public set_enroll_fee(new_fee: u128): u128 {
@@ -195,21 +212,29 @@ class Form {
         }
     }
 
-    set_element_title(element_id: string, new_title: string[]): void {
-        const element = ElementStorage.get(element_id);
-        if (element == null) {
-            return;
-        }
-        element.set_title(new_title);
-    }
+    // set_element_title(element_id: string, new_title: string[]): void {
+    //     const element = ElementStorage.get(element_id);
+    //     if (element == null) {
+    //         return;
+    //     }
+    //     element.set_title(new_title);
+    // }
 
-    set_element_meta(element_id: string, new_meta: Set<string>): void {
-        const element = ElementStorage.get(element_id);
-        if (element == null) {
-            return;
-        }
-        element.set_meta(new_meta);
-    }
+    // set_element_meta(element_id: string, new_meta: Set<string>): void {
+    //     const element = ElementStorage.get(element_id);
+    //     if (element == null) {
+    //         return;
+    //     }
+    //     element.set_meta(new_meta);
+    // }
+
+    // set_element_required(element_id: string, new_required: bool): void {
+    //     const element = ElementStorage.get(element_id);
+    //     if (element == null) {
+    //         return;
+    //     }
+    //     element.set_required(new_required);
+    // }
 
     save(): void {
         FormStorage.set(this.id, this);
@@ -257,6 +282,8 @@ class Form {
             this.end_date = 0;
             this.enroll_fee = u128.Zero;
             this.limit_participants = 0;
+            BlackListStorage.deletes(this.id);
+            WhiteListStorage.deletes(this.id);
             const participants = this.participants.values();
             const participant_length = participants.length;
             for (let i = 0; i < participant_length; i++) {
@@ -343,13 +370,15 @@ class Form {
         return `{id: ${this.id}, owner: ${this.owner}, element: ${this.elements.values()}}`;
     }
 
-    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
+    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>): bool {
         if (this.status == FORM_STATUS.EDITING) {
             this.start_date = start_date;
             this.limit_participants = limit_participants;
             this.end_date = end_date;
             this.enroll_fee = enroll_fee;
             this.status = FORM_STATUS.STARTING;
+            BlackListStorage.sets(this.id, black_list);
+            WhiteListStorage.sets(this.id, white_list);
             this.save();
             return true;
         }

@@ -5,22 +5,32 @@ import * as Participant from "./controller/participant.controller";
 
 import { PaginationResult } from "./helper/pagination.helper";
 import FormModel from "./model/form.model";
+import { FORM_TYPE } from "./model/form.model";
 import QuestionModel from "./model/element.model";
 import { ElementType } from "./model/element.model";
 import { UserAnswer } from "./model/passed_element";
 import { logging, u128 } from "near-sdk-as";
 import { ParticipantFormResponse } from "./model/response/participant_form";
+import { FormStatusResponse } from "./model/response/form_status";
 
-export function init_new_form(title: string, description: string): string | null {
-    return Form.init_new_form(title, description);
+export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
+    return Form.init_new_form(title, description, type);
 }
 
 export function get_form(id: string): FormModel | null {
     return Form.get_form(id);
 }
 
-export function publish_form(formId: string, limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64): bool {
-    return Form.publish_form(formId, limit_participants, enroll_fee, start_date, end_date);
+export function publish_form(
+    formId: string,
+    limit_participants: i32,
+    enroll_fee: u128,
+    start_date: u64,
+    end_date: u64,
+    black_list: Set<string>,
+    white_list: Set<string>,
+): bool {
+    return Form.publish_form(formId, limit_participants, enroll_fee, start_date, end_date, black_list, white_list);
 }
 
 export function unpublish_form(formId: string): bool {
@@ -63,12 +73,16 @@ export function get_form_count(userId: string): i32 {
     return Form.get_form_count(userId);
 }
 
+export function get_form_status(formId: string): FormStatusResponse {
+    return Form.get_form_status(formId);
+}
+
 export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
     return Answer.submit_answer(formId, elementId, answer);
 }
 
-export function update_element(formId: string, id: string, title: string[], meta: Set<string>): QuestionModel | null {
-    return Question.update_element(formId, id, title, meta);
+export function update_element(formId: string, id: string, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
+    return Question.update_element(formId, id, title, meta, isRequired);
 }
 
 export function update_form(id: string, title: string, description: string): FormModel | null {

@@ -72,6 +72,10 @@ class Element {
         this.meta = newMeta;
     }
 
+    set_required(newRequired: bool): void {
+        this.isRequired = newRequired;
+    }
+
     toString(): string {
         return `{id: ${this.id}, owner: ${this.owner},q_counter: ${this.title}, title: ${this.title}, meta:${this.meta}}`;
     }
