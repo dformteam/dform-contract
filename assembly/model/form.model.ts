@@ -14,6 +14,7 @@ import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { logging, env } from "near-sdk-as";
 import Base from "./base.model";
+import { calStorageFee, ComponentFee } from "../helper/calculation.helper";
 
 export enum FORM_STATUS {
     EDITING,
@@ -152,6 +153,10 @@ class Form extends Base {
         }
     }
 
+    get_description(): string {
+        return this.description;
+    }
+
     set_retry(value: bool): void {
         if (this.isRetry != value) {
             this.isRetry = value;
@@ -240,9 +245,15 @@ class Form extends Base {
     // }
 
     save(): void {
-        this.cal_storage_fee(this.id, this.toString());
         FormStorage.set(this.id, this);
         UserFormStorage.set(this.owner, this.id);
+        // TODO: Tinh toan chi phi luu tru cho cac component nho
+        let compFee: ComponentFee = {
+            id: `UserFormStorage`,
+            value: calStorageFee(this.owner, this.id)
+        }
+        this.componentStorageFee.push(compFee);
+        this.cal_storage_fee(this.id, this.toString());
     }
 
     remove(): void {
@@ -258,7 +269,7 @@ class Form extends Base {
             newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
-            this.componentStorageFee = u128.add(this.componentStorageFee, newElement.get_storage_fee());
+            // this.componentStorageFee = u128.add(this.componentStorageFee, newElement.get_storage_fee());
             // TODO: Them co che cho phep owner nap them tien vao de duy tri dich vu
             return newElement;
         }
