@@ -1,10 +1,11 @@
 import { u128 } from "near-sdk-as";
-export const NEAR_FEE_PER_BYTE = "10000000000000000000"; // 1 NEAR
-export const DEFAULT_STORAGE_FEE = "1000000000000000000000"; // 0.001 NEAR
+export const NEAR_FEE_PER_BYTE = "10000000000000000000"; 
+export const DEFAULT_STORAGE_FEE = "10000000000000000000000"; // 0.01 NEAR
 
 @nearBindgen
 export default class Base {
     public storageFee: u128 = u128.from(DEFAULT_STORAGE_FEE);
+    public componentStorageFee: u128 = u128.Zero;
     constructor() { }
 
     get_storage_fee(): u128 {

@@ -258,6 +258,8 @@ class Form extends Base {
             newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
+            this.componentStorageFee = u128.add(this.componentStorageFee, newElement.get_storage_fee());
+            // TODO: Them co che cho phep owner nap them tien vao de duy tri dich vu
             return newElement;
         }
         return null;
