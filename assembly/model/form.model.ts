@@ -35,8 +35,8 @@ class Form extends Base {
     private created_at: u64;
     private limit_participants: i32;
     private enroll_fee: u128;
-    private start_date: u64;
-    private end_date: u64;
+    public start_date: u64;
+    public end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
     private isRetry: bool = false;
@@ -245,15 +245,15 @@ class Form extends Base {
     // }
 
     save(): void {
+        this.cal_storage_fee(this.id, this.toString());
         FormStorage.set(this.id, this);
         UserFormStorage.set(this.owner, this.id);
         // TODO: Tinh toan chi phi luu tru cho cac component nho
-        let compFee: ComponentFee = {
-            id: `UserFormStorage`,
-            value: calStorageFee(this.owner, this.id)
-        }
-        this.componentStorageFee.push(compFee);
-        this.cal_storage_fee(this.id, this.toString());
+        // let compFee: ComponentFee = {
+        //     id: `UserFormStorage`,
+        //     value: calStorageFee(this.owner, this.id)
+        // }
+        // this.componentStorageFee.push(compFee);
     }
 
     remove(): void {
