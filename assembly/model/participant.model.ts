@@ -67,6 +67,10 @@ class Participant {
         return new PaginationResult(page, forms_length, ret.values());
     }
 
+    get_joined_form_count(): i32 {
+        return this.forms.size;
+    }
+
     remove_form(form_id: string): void {
         if (this.forms.has(form_id)) {
             this.forms.delete(form_id);

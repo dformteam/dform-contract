@@ -30,9 +30,7 @@ export function delete_element(formId: string, id: string): bool {
         return false;
     }
 
-    const result = form.remove_element(id);
-
-    return result;
+    return form.remove_element(id);
 }
 
 export function update_element(formId: string, id: string, title: string[], meta: Set<string>, isRequired: bool): Question | null {

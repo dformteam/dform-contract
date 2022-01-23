@@ -145,7 +145,7 @@ class Form {
 
     set_description(newDescription: string): void {
         if (newDescription !== "" && this.description !== newDescription) {
-            this.description = this.description;
+            this.description = newDescription;
         }
     }
 
@@ -260,15 +260,15 @@ class Form {
     }
 
     remove_element(id: string): bool {
-        const currentTimestamp = Context.blockTimestamp;
-        if (this.status != FORM_STATUS.EDITING || currentTimestamp > this.start_date) {
+        if (this.status != FORM_STATUS.EDITING) {
             return false;
         }
 
         if (this.elements.has(id)) {
-            this.elements.delete(id);
-            this.save();
-            return true;
+            if (this.elements.delete(id)) {
+                this.save();
+                return true;
+            }
         }
 
         return false;
@@ -442,7 +442,7 @@ class Form {
         return ElementStorage.get(element_id);
     }
 
-    publicAsATemplate(): void {}
+    // publicAsATemplate(): void {}
 }
 
 export default Form;
