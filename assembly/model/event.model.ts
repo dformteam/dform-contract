@@ -96,7 +96,7 @@ class Event extends Base {
 
     interest(invitation_code: string = ''): bool {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.end_date) return false;
+        if (this.end_date && current_timestamp > this.end_date) return false;
         if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY && this.invitation_code !== invitation_code) {
             return false;
         }
@@ -111,7 +111,7 @@ class Event extends Base {
 
     not_interest(): bool {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.end_date) return false;
+        if (this.end_date && current_timestamp > this.end_date) return false;
         const sender = Context.sender;
         if (this.interests.has(sender)) {
             this.interests.delete(sender);
@@ -123,7 +123,7 @@ class Event extends Base {
 
     join(invitation_code: string = ''): bool {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.end_date) return false;
+        if (this.end_date && current_timestamp > this.end_date) return false;
         if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY && this.invitation_code !== invitation_code) {
             return false;
         }
@@ -145,7 +145,7 @@ class Event extends Base {
 
     exit_event(): bool {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.end_date) return false;
+        if (this.end_date && current_timestamp > this.end_date) return false;
         const sender = Context.sender;
         if (this.participants.has(sender)) {
             this.participants.delete(sender);
@@ -158,7 +158,7 @@ class Event extends Base {
 
     update_participant_fee(new_fee: u128): u128 | null {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.start_date) return null;
+        if (this.start_date && current_timestamp > this.start_date) return null;
         this.participant_fee = new_fee;
         this.save();
         return this.participant_fee;
@@ -177,7 +177,7 @@ class Event extends Base {
         end_date: u64 = 0
     ): bool {
         let current_timestamp = Context.blockTimestamp / 1000000;
-        if (current_timestamp > this.start_date) return false;
+        if (this.start_date && current_timestamp > this.start_date) return false;
         if (name !== '') this.name = name;
         if (description !== '') this.description = description;
         if (location !== '') this.location = location;

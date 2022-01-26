@@ -50,8 +50,7 @@ export function update_event_info(
 ): bool {
     const event: Event | null = EventStorage.get(event_id);
     if (!event) return false;
-    event.update_event_info(title, description, location, cover_img, start_date, end_date);
-    return true;
+    return event.update_event_info(title, description, location, cover_img, start_date, end_date);
 }
 
 export function set_participant_fee(event_id: string, new_fee: u128): u128 | null {
