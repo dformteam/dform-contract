@@ -10,7 +10,7 @@ near call xtest3.testnet join_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmo
 near call xtest3.testnet submit_answer '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "elementId": "8ArNoKHTUmLJCz7j6mhZqcSmkAE7WXALtnQPLtkLJUa29SPhX9PdrK2ssutouTELD3adyWg859gpgx9uwEUTS", "answer": ["123123"]}' --account-id xtest3.testnet --gas=300000000000000
 near call xtest3.testnet get_answer_statistical '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet --gas=300000000000000
 
-near view xtest3.testnet get_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
+near view xtest3.testnet get_forms '{"userId": "gefi_hub.testnet", "page": 1}' --account-id xtest3.testnet
 near view xtest3.testnet get_joined_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
 near view xtest3.testnet test '{"title": ["123", "123123", "345345"]}' --account-id xtest3.testnet
 near view xtest3.testnet get_elements '{"formId": "qCsqqzSCyGMNbXh3aLep8NJRntYn5i3XUfWEMi6JCGr9a1DSA", "userId": "mtoan2193.testnet", "page": 1}' --account-id xtest3.testnet

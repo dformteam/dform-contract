@@ -3,13 +3,13 @@ import * as Question from "./controller/element.controller";
 import * as Answer from "./controller/answer.controller";
 import * as Participant from "./controller/participant.controller";
 
+import { logging, u128 } from "near-sdk-as";
 import { PaginationResult } from "./helper/pagination.helper";
 import FormModel from "./model/form.model";
 import { FORM_TYPE } from "./model/form.model";
 import QuestionModel from "./model/element.model";
 import { ElementType } from "./model/element.model";
 import { UserAnswer } from "./model/passed_element";
-import { logging, u128 } from "near-sdk-as";
 import { ParticipantFormResponse } from "./model/response/participant_form";
 import { FormStatusResponse } from "./model/response/form_status";
 import { ParticipantFormStatusResponse } from "./model/response/participant_form_status";
@@ -54,8 +54,8 @@ export function get_joined_forms_count(userId: string): i32 {
     return Participant.get_joined_forms_count(userId);
 }
 
-export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
-    return Question.new_element(formId, type, title, meta, isRequired);
+export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool, numth: i32): QuestionModel | null {
+    return Question.new_element(formId, type, title, meta, isRequired, numth);
 }
 
 export function delete_element(formId: string, id: string): bool {
@@ -83,6 +83,7 @@ export function get_form_status(formId: string): FormStatusResponse {
 }
 
 export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
+    logging.log(elementId);
     return Answer.submit_answer(formId, elementId, answer);
 }
 

@@ -1,4 +1,4 @@
-import { Context } from "near-sdk-core";
+import { Context, logging } from "near-sdk-core";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { FormStorage } from "../storage/form.storage";
@@ -42,6 +42,7 @@ class Participant {
 
     get_joined_form(page: i32): PaginationResult<ParticipantFormResponse> {
         const forms = this.forms.values();
+        logging.log(forms);
         const forms_length = forms.length;
         const paginationOffset = getPaginationOffset(forms_length, page);
 
@@ -62,7 +63,7 @@ class Participant {
             }
 
             const passed_question = participant_form.get_passed_question();
-            ret.add(new ParticipantFormResponse(this.id, form_id, form.get_title(), passed_question));
+            ret.add(new ParticipantFormResponse(this.id, form_id, form.get_title(), passed_question, form.get_type(), participant_form.get_last_submited()));
         }
         return new PaginationResult(page, forms_length, ret.values());
     }

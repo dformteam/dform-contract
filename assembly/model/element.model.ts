@@ -31,6 +31,7 @@ class Element {
         private formId: string,
         private isRequired: bool,
         private nonce: i32,
+        private numth: i32,
     ) {
         this.owner = Context.sender;
         this.generate_id(formId);
@@ -64,8 +65,16 @@ class Element {
         return this.type;
     }
 
+    get_numth(): i32 {
+        return this.numth;
+    }
+
     set_title(newTitle: string[]): void {
         this.title = newTitle;
+    }
+
+    get_meta(): string[] {
+        return this.meta.values();
     }
 
     set_meta(newMeta: Set<string>): void {

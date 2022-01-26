@@ -1,11 +1,11 @@
-import { Context } from "near-sdk-core";
+import { Context, logging } from "near-sdk-core";
 import { pagination, PaginationResult } from "../helper/pagination.helper";
 import Question from "../model/element.model";
 import { ElementType } from "../model/element.model";
 import { ElementStorage } from "../storage/element.storage";
 import { FormStorage } from "../storage/form.storage";
 
-export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Question | null {
+export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool, numth: i32): Question | null {
     if (title.length == 0 || title[0] == "") {
         return null;
     }
@@ -15,7 +15,7 @@ export function new_element(formId: string, type: ElementType, title: string[], 
         return null;
     }
 
-    return existedForm.add_new_element(type, title, meta, isRequired);
+    return existedForm.add_new_element(type, title, meta, isRequired, numth);
 }
 
 export function delete_element(formId: string, id: string): bool {
@@ -84,10 +84,10 @@ export function get_elements(userId: string, formId: string, page: i32): Paginat
         return new PaginationResult(1, 0, new Array<Question>(0));
     }
 
-    if (form.get_owner() != userId) {
-        return new PaginationResult(1, 0, new Array<Question>(0));
+    if (form.has_participant(userId) || form.get_owner() == userId) {
+        const elements = form.get_elements();
+        return pagination<Question>(elements, page);
     }
 
-    const elements = form.get_elements();
-    return pagination<Question>(elements, page);
+    return new PaginationResult(1, 0, new Array<Question>(0));
 }

@@ -99,6 +99,10 @@ class Form {
         return this.elements.has(element_id);
     }
 
+    public has_participant(participant: string): bool {
+        return this.participants.has(participant);
+    }
+
     public set_enroll_fee(new_fee: u128): u128 {
         this.enroll_fee = new_fee;
         this.save();
@@ -246,11 +250,11 @@ class Form {
         UserFormStorage.delete(this.owner, this.id);
     }
 
-    add_new_element(type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Element | null {
+    add_new_element(type: ElementType, title: string[], meta: Set<string>, isRequired: bool, numth: i32): Element | null {
         const sender = Context.sender;
         if (this.owner == sender && this.status == FORM_STATUS.EDITING) {
             this.nonce += 1;
-            const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce);
+            const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce, numth);
             newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
@@ -312,13 +316,18 @@ class Form {
             }
 
             const participants_length = this.participants.size;
-            if (this.limit_participants != 0 && participants_length >= this.limit_participants) {
+            if (this.limit_participants > 0 && participants_length >= this.limit_participants) {
                 return false;
             }
 
             this.participants.add(sender);
 
-            const participant = new Participant();
+            let participant = ParticipantStorage.get(sender);
+
+            if (participant == null) {
+                participant = new Participant();
+            }
+
             participant.join_form(this.id);
 
             participant.save();
@@ -413,7 +422,17 @@ class Form {
                 const element_type = element.get_type();
                 const passed_element_content = passed_element.get_content().values();
                 const passed_element_submit_time = passed_element.get_submit_time();
-                result.add(new UserAnswer(element.get_id(), element_title, element_type, passed_element_content, passed_element_submit_time));
+                result.add(
+                    new UserAnswer(
+                        element.get_id(),
+                        element_title,
+                        element_type,
+                        passed_element_content,
+                        passed_element_submit_time,
+                        element.get_numth(),
+                        element.get_meta(),
+                    ),
+                );
             }
         }
 
