@@ -11,6 +11,7 @@ import { EVENT_TYPE } from "../model/event.model";
 import { EventStorage } from "../storage/event.storage";
 
 const CREATE_EVENT_COST = "10000000000000000000"; // 1 NEAR
+const JOIN_EVENT_COST = "100000000000000000"; // 0.01 NEAR
 
 export function init_new_event(
     name: string,
@@ -66,6 +67,18 @@ export function get_participant_fee(event_id: string): u128 | null {
     return event.get_participant_fee();
 }
 
+export function get_num_of_participants(event_id: string): i32 {
+    const event: Event | null = EventStorage.get(event_id);
+    if (!event) return -1;
+    return event.get_number_of_participants();
+}
+
+export function get_num_of_interests(event_id: string): i32 {
+    const event: Event | null = EventStorage.get(event_id);
+    if (!event) return -1;
+    return event.get_number_of_interests();
+}
+
 export function delete_event(id: string): bool {
     const sender = Context.sender;
     const existedEvent = EventStorage.get(id);
@@ -91,6 +104,16 @@ export function not_interest_event(event_id: string): bool {
 export function join_event(event_id: string, invitation_code: string = ''): bool {
     const event: Event | null = EventStorage.get(event_id);
     if (!event) return false;
+    if (u128.lt(Context.attachedDeposit, event.get_participant_fee())) {
+        return false;
+    }
+    if (u128.eq(u128.Zero, event.get_participant_fee())) {
+        return false;
+    }
+    if (!u128.eq(u128.Zero, event.get_participant_fee())) {
+        let withdraw_token = u128.sub(Context.attachedDeposit, u128.from(JOIN_EVENT_COST));
+        ContractPromiseBatch.create(event.owner).transfer(withdraw_token);
+    }
     return event.join(invitation_code);
 }
 

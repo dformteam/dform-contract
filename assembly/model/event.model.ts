@@ -1,4 +1,4 @@
-import { base58, Context, u128, util } from "near-sdk-as";
+import { base58, Context, logging, u128, util } from "near-sdk-as";
 import { calStorageFee } from "../helper/calculation.helper";
 import { EventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
@@ -54,6 +54,12 @@ class Event extends Base {
         if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY) {
             this.generate_invitation_code();
         }
+        if (this.participants == null) {
+            this.participants = new Set<string>();
+        }
+        if (this.interests == null) {
+            this.interests = new Set<string>();
+        }
         this.generate_id();
     }
 
@@ -95,9 +101,9 @@ class Event extends Base {
     }
 
     interest(invitation_code: string = ''): bool {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.end_date && current_timestamp > this.end_date) return false;
-        if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY && this.invitation_code !== invitation_code) {
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.end_date && current_timestamp > this.end_date) return false;
+        if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY && this.invitation_code != invitation_code) {
             return false;
         }
         const sender = Context.sender;
@@ -110,8 +116,8 @@ class Event extends Base {
     }
 
     not_interest(): bool {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.end_date && current_timestamp > this.end_date) return false;
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.end_date && current_timestamp > this.end_date) return false;
         const sender = Context.sender;
         if (this.interests.has(sender)) {
             this.interests.delete(sender);
@@ -122,9 +128,9 @@ class Event extends Base {
     }
 
     join(invitation_code: string = ''): bool {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.end_date && current_timestamp > this.end_date) return false;
-        if (this.available_type == AVAILABLE_TYPE.INVITE_ONLY && this.invitation_code !== invitation_code) {
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.end_date && current_timestamp > this.end_date) return false;
+        if ((this.available_type == AVAILABLE_TYPE.INVITE_ONLY) && (this.invitation_code != invitation_code)) {
             return false;
         }
         const sender = Context.sender;
@@ -144,8 +150,8 @@ class Event extends Base {
     }
 
     exit_event(): bool {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.end_date && current_timestamp > this.end_date) return false;
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.end_date && current_timestamp > this.end_date) return false;
         const sender = Context.sender;
         if (this.participants.has(sender)) {
             this.participants.delete(sender);
@@ -157,8 +163,8 @@ class Event extends Base {
 
 
     update_participant_fee(new_fee: u128): u128 | null {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.start_date && current_timestamp > this.start_date) return null;
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.start_date && current_timestamp > this.start_date) return null;
         this.participant_fee = new_fee;
         this.save();
         return this.participant_fee;
@@ -176,8 +182,8 @@ class Event extends Base {
         start_date: u64 = 0,
         end_date: u64 = 0
     ): bool {
-        let current_timestamp = Context.blockTimestamp / 1000000;
-        if (this.start_date && current_timestamp > this.start_date) return false;
+        // let current_timestamp = Context.blockTimestamp / 1000000;
+        // if (this.start_date && current_timestamp > this.start_date) return false;
         if (name !== '') this.name = name;
         if (description !== '') this.description = description;
         if (location !== '') this.location = location;
@@ -207,6 +213,14 @@ class Event extends Base {
     // get_event_type(): EVENT_TYPE {
     //     return this.event_type;
     // }
+
+    get_number_of_participants(): i32 {
+        return this.participants.size
+    }
+
+    get_number_of_interests(): i32 {
+        return this.interests.size
+    }
 
     get_location(): string {
         return this.location;

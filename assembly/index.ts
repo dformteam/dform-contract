@@ -172,6 +172,14 @@ export function get_participant_fee(event_id: string): u128 | null {
     return Event.get_participant_fee(event_id);
 }
 
+export function get_num_of_interests(event_id: string): i32 {
+    return Event.get_num_of_interests(event_id);
+}
+
+export function get_num_of_participants(event_id: string): i32 {
+    return Event.get_num_of_participants(event_id);
+}
+
 export function delete_event(event_id: string): bool {
     return Event.delete_event(event_id);
 }
