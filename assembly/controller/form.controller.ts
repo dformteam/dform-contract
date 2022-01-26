@@ -82,7 +82,6 @@ export function join_form(formId: string): bool {
     }
     if (!u128.eq(u128.Zero, existedForm.get_enroll_fee()) && current_storage_fee) {
         let withdraw_token = u128.sub(Context.attachedDeposit, current_storage_fee);
-        logging.log(`withdraw_token => ${withdraw_token}`);
         ContractPromiseBatch.create(existedForm.get_owner()).transfer(withdraw_token);
     }
 

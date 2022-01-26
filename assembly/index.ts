@@ -13,8 +13,9 @@ import { UserAnswer } from "./model/passed_element";
 import { logging, u128 } from "near-sdk-as";
 import { ParticipantFormResponse } from "./model/response/participant_form";
 import { FormStatusResponse } from "./model/response/form_status";
-import EventModel from "./model/event.model";
+import { AVAILABLE_TYPE } from "./model/event.model";
 import { EVENT_TYPE } from "./model/event.model";
+import EventModel from "./model/event.model";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
     return Form.init_new_form(title, description, type);
@@ -132,20 +133,19 @@ export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
     return Form.set_enroll_fee(formId, new_fee);
 }
 
+// ------------------------------------
+
 export function init_new_event(
-    title: string,
-    description: string,
-    type: EVENT_TYPE,
-    location: string,
-    cover_img: string,
-    start_date: u64,
-    end_date: u64
+    name: string,
+    event_type: EVENT_TYPE,
+    available_type: AVAILABLE_TYPE,
+    participant_fee: u128
 ): string | null {
-    return Event.init_new_event(title, description, type, location, cover_img, start_date, end_date);
+    return Event.init_new_event(name, event_type, available_type, participant_fee);
 }
 
-export function get_register_form_id(event_id: string): string | null {
-    return Event.get_register_form_id(event_id);
+export function get_invitation_code(event_id: string): string | null {
+    return Event.get_invitation_code(event_id);
 }
 
 export function get_event(event_id: string): EventModel | null {
@@ -164,10 +164,6 @@ export function update_event_info(
     return Event.update_event_info(event_id, title, description, location, cover_img, start_date, end_date);
 }
 
-export function update_event_type(event_id: string, event_type: EVENT_TYPE): bool {
-    return Event.update_event_type(event_id, event_type);
-}
-
 export function set_participant_fee(event_id: string, new_fee: u128): u128 | null {
     return Event.set_participant_fee(event_id, new_fee);
 }
@@ -180,6 +176,18 @@ export function delete_event(event_id: string): bool {
     return Event.delete_event(event_id);
 }
 
-export function publish_event(event_id: string, limit_participants: i32, enroll_fee: u128, black_list: Set<string>, white_list: Set<string>): bool {
-    return Event.publish_event(event_id, limit_participants, enroll_fee, black_list, white_list);
+export function interest_event(event_id: string, invitation_code: string = ''): bool {
+    return Event.interest_event(event_id, invitation_code);
+}
+
+export function not_interest_event(event_id: string): bool {
+    return Event.not_interest_event(event_id);
+}
+
+export function join_event(event_id: string, invitation_code: string = ''): bool {
+    return Event.join_event(event_id, invitation_code);
+}
+
+export function exit_event(event_id: string): bool {
+    return Event.exit_event(event_id);
 }
