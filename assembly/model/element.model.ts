@@ -33,6 +33,7 @@ class Element extends Base {
         private formId: string,
         private isRequired: bool,
         private nonce: i32,
+        private numth: i32,
     ) {
         super();
         this.owner = Context.sender;
@@ -67,8 +68,16 @@ class Element extends Base {
         return this.type;
     }
 
+    get_numth(): i32 {
+        return this.numth;
+    }
+
     set_title(newTitle: string[]): void {
         this.title = newTitle;
+    }
+
+    get_meta(): string[] {
+        return this.meta.values();
     }
 
     set_meta(newMeta: Set<string>): void {

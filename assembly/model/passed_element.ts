@@ -6,7 +6,15 @@ import { ElementType } from "./element.model";
 @nearBindgen
 export class UserAnswer {
     private participantId: string;
-    constructor(private element_id: string, private title: string[], private type: ElementType, private answer: string[], private submit_time: u64) {
+    constructor(
+        private element_id: string,
+        private title: string[],
+        private type: ElementType,
+        private answer: string[],
+        private submit_time: u64,
+        private numth: i32,
+        private meta: string[],
+    ) {
         this.participantId = Context.sender;
     }
 }

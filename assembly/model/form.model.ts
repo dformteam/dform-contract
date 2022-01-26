@@ -41,6 +41,7 @@ class Form extends Base {
     private participants: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
+    public total_storage_fee: u128 = u128.Zero;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         super();
@@ -103,6 +104,10 @@ class Form extends Base {
         return this.elements.has(element_id);
     }
 
+    public has_participant(participant: string): bool {
+        return this.participants.has(participant);
+    }
+
     public set_enroll_fee(new_fee: u128): u128 {
         this.enroll_fee = new_fee;
         this.save();
@@ -149,7 +154,7 @@ class Form extends Base {
 
     set_description(newDescription: string): void {
         if (newDescription !== "" && this.description !== newDescription) {
-            this.description = this.description;
+            this.description = newDescription;
         }
     }
 
@@ -261,11 +266,11 @@ class Form extends Base {
         UserFormStorage.delete(this.owner, this.id);
     }
 
-    add_new_element(type: ElementType, title: string[], meta: Set<string>, isRequired: bool): Element | null {
+    add_new_element(type: ElementType, title: string[], meta: Set<string>, isRequired: bool, numth: i32): Element | null {
         const sender = Context.sender;
         if (this.owner == sender && this.status == FORM_STATUS.EDITING) {
             this.nonce += 1;
-            const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce);
+            const newElement = new Element(type, title, meta, this.id, isRequired, this.nonce, numth);
             newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
@@ -277,15 +282,15 @@ class Form extends Base {
     }
 
     remove_element(id: string): bool {
-        const currentTimestamp = Context.blockTimestamp;
-        if (this.status != FORM_STATUS.EDITING || currentTimestamp > this.start_date) {
+        if (this.status != FORM_STATUS.EDITING) {
             return false;
         }
 
         if (this.elements.has(id)) {
-            this.elements.delete(id);
-            this.save();
-            return true;
+            if (this.elements.delete(id)) {
+                this.save();
+                return true;
+            }
         }
 
         return false;
@@ -317,7 +322,7 @@ class Form extends Base {
         return false;
     }
 
-    join(): u128 | null {
+    join(): bool {
         const sender = Context.sender;
 
         if (!this.participants.has(sender)) {
@@ -325,17 +330,22 @@ class Form extends Base {
             const is_in_black_list = BlackListStorage.contains(this.id, sender);
 
             if (!is_in_white_list || is_in_black_list) {
-                return null;
+                return false;
             }
 
             const participants_length = this.participants.size;
-            if (this.limit_participants != 0 && participants_length >= this.limit_participants) {
-                return null;
+            if (this.limit_participants > 0 && participants_length >= this.limit_participants) {
+                return false;
             }
 
             this.participants.add(sender);
 
-            const participant = new Participant();
+            let participant = ParticipantStorage.get(sender);
+
+            if (participant == null) {
+                participant = new Participant();
+            }
+
             participant.join_form(this.id);
 
             participant.save();
@@ -345,12 +355,12 @@ class Form extends Base {
             this.save();
 
             let cur_participant_fee = u128.add(participant.get_storage_fee(), participant_form.get_storage_fee());
-            let total_storage_fee = u128.add(cur_participant_fee, this.get_storage_fee());
+            this.total_storage_fee = u128.add(cur_participant_fee, this.get_storage_fee());
 
-            return total_storage_fee;
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     submit_answer(userId: string, elementId: string, answers: Set<string>): bool {
@@ -433,7 +443,17 @@ class Form extends Base {
                 const element_type = element.get_type();
                 const passed_element_content = passed_element.get_content().values();
                 const passed_element_submit_time = passed_element.get_submit_time();
-                result.add(new UserAnswer(element.get_id(), element_title, element_type, passed_element_content, passed_element_submit_time));
+                result.add(
+                    new UserAnswer(
+                        element.get_id(),
+                        element_title,
+                        element_type,
+                        passed_element_content,
+                        passed_element_submit_time,
+                        element.get_numth(),
+                        element.get_meta(),
+                    ),
+                );
             }
         }
 

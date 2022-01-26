@@ -4,18 +4,19 @@ import * as Answer from "./controller/answer.controller";
 import * as Participant from "./controller/participant.controller";
 import * as Event from "./controller/event.controller";
 
+import { logging, u128 } from "near-sdk-as";
 import { PaginationResult } from "./helper/pagination.helper";
 import FormModel from "./model/form.model";
 import { FORM_TYPE } from "./model/form.model";
 import QuestionModel from "./model/element.model";
 import { ElementType } from "./model/element.model";
 import { UserAnswer } from "./model/passed_element";
-import { logging, u128 } from "near-sdk-as";
 import { ParticipantFormResponse } from "./model/response/participant_form";
 import { FormStatusResponse } from "./model/response/form_status";
 import { AVAILABLE_TYPE } from "./model/event.model";
 import { EVENT_TYPE } from "./model/event.model";
 import EventModel from "./model/event.model";
+import { ParticipantFormStatusResponse } from "./model/response/participant_form_status";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
     return Form.init_new_form(title, description, type);
@@ -53,8 +54,12 @@ export function get_joined_forms(userId: string, page: i32): PaginationResult<Pa
     return Participant.get_joined_forms(userId, page);
 }
 
-export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
-    return Question.new_element(formId, type, title, meta, isRequired);
+export function get_joined_forms_count(userId: string): i32 {
+    return Participant.get_joined_forms_count(userId);
+}
+
+export function new_element(formId: string, type: ElementType, title: string[], meta: Set<string>, isRequired: bool, numth: i32): QuestionModel | null {
+    return Question.new_element(formId, type, title, meta, isRequired, numth);
 }
 
 export function delete_element(formId: string, id: string): bool {
@@ -82,6 +87,7 @@ export function get_form_status(formId: string): FormStatusResponse {
 }
 
 export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
+    logging.log(elementId);
     return Answer.submit_answer(formId, elementId, answer);
 }
 
@@ -99,6 +105,10 @@ export function delete_form(id: string): bool {
 
 export function get_answer_statistical(userId: string, formId: string, page: i32): PaginationResult<UserAnswer> {
     return Participant.get_answer_statistical(userId, formId, page);
+}
+
+export function get_participant_form_status(userId: string, formId: string): ParticipantFormStatusResponse {
+    return Participant.get_participant_form_status(userId, formId);
 }
 
 export function test(title: Set<string>): void {
@@ -198,4 +208,7 @@ export function join_event(event_id: string, invitation_code: string = ''): bool
 
 export function exit_event(event_id: string): bool {
     return Event.exit_event(event_id);
+}
+export function get_passed_element_count(userId: string, formId: string): i32 {
+    return Participant.get_passed_element_count(userId, formId);
 }

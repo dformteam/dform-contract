@@ -1,5 +1,4 @@
-import { Context } from "near-sdk-core";
-import { u128 } from "near-sdk-as";
+import { Context, logging, u128 } from "near-sdk-core";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { FormStorage } from "../storage/form.storage";
@@ -69,9 +68,13 @@ class Participant extends Base {
             }
 
             const passed_question = participant_form.get_passed_question();
-            ret.add(new ParticipantFormResponse(this.id, form_id, form.get_title(), passed_question));
+            ret.add(new ParticipantFormResponse(this.id, form_id, form.get_title(), passed_question, form.get_type(), participant_form.get_last_submited()));
         }
         return new PaginationResult(page, forms_length, ret.values());
+    }
+
+    get_joined_form_count(): i32 {
+        return this.forms.size;
     }
 
     remove_form(form_id: string): void {

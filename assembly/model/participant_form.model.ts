@@ -43,6 +43,10 @@ class ParticipantForm extends Base {
         return this.passed_element.size;
     }
 
+    get_last_submited(): u64 {
+        return this.lastSubmitTimestamp;
+    }
+
     get_passed_question(): i32 {
         const elements = this.passed_element.values();
         let count = 0;

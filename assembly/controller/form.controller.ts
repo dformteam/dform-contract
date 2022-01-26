@@ -76,16 +76,16 @@ export function join_form(formId: string): bool {
     if (u128.eq(u128.Zero, existedForm.get_enroll_fee()) && (existedForm.get_current_num_participants() >= (FREE_FORM_MAX_NUM_PARTICIPANTS))) {
         return false;
     }
-    let current_storage_fee: u128 | null = existedForm.join();
-    if (!current_storage_fee) {
+    let join_stt = existedForm.join();
+    if (!existedForm.total_storage_fee) {
         return false;
     }
-    if (!u128.eq(u128.Zero, existedForm.get_enroll_fee()) && current_storage_fee) {
-        let withdraw_token = u128.sub(Context.attachedDeposit, current_storage_fee);
+    if (!u128.eq(u128.Zero, existedForm.get_enroll_fee()) && existedForm.total_storage_fee) {
+        let withdraw_token = u128.sub(Context.attachedDeposit, existedForm.total_storage_fee);
         ContractPromiseBatch.create(existedForm.get_owner()).transfer(withdraw_token);
     }
 
-    return true;
+    return true && join_stt;
 }
 
 export function publish_form(
