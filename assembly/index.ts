@@ -114,3 +114,11 @@ export function test(title: Set<string>): void {
 export function get_passed_element_count(userId: string, formId: string): i32 {
     return Participant.get_passed_element_count(userId, formId);
 }
+
+export function get_participants_count(): i32 {
+    return Participant.get_participants_count();
+}
+
+export function get_forms_count(): i32 {
+    return Form.get_forms_count();
+}

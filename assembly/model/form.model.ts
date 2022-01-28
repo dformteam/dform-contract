@@ -424,6 +424,7 @@ class Form {
                 const passed_element_submit_time = passed_element.get_submit_time();
                 result.add(
                     new UserAnswer(
+                        userId,
                         element.get_id(),
                         element_title,
                         element_type,

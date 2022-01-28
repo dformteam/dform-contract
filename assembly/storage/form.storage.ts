@@ -30,6 +30,10 @@ export class FormStorage {
     static delete(id: string): void {
         formPersit.delete(id);
     }
+
+    static count(): i32 {
+        return formPersit.length;
+    }
 }
 
 export class FormAnalysistStorage {

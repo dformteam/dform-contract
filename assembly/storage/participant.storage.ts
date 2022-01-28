@@ -50,4 +50,8 @@ export class ParticipantStorage {
             participantDetailPersit.delete(id);
         }
     }
+
+    static count(): i32 {
+        return participantDetailPersit.length;
+    }
 }

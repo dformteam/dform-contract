@@ -1,20 +1,24 @@
 near call xtest3.testnet init_new_form '{"title": "test_dep", "description":"formtest", "type": 0}' --account-id xtest3.testnet --gas=300000000000000
-near view xtest3.testnet get_form '{"id": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu"}' --account-id xtest3.testnet
+near view xtest3.testnet get_form '{"id": "BKNttCuSxPEocPiRAfZGd21nrHitePhFG4VH5bBs37qZaZgs"}' --account-id xtest3.testnet
+near view xtest3.testnet get_forms_count '{}' --account-id xtest3.testnet
+near view xtest3.testnet get_participants_count '{}' --account-id xtest3.testnet
 near call xtest3.testnet new_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "type": 2, "title": ["q_test2222332254_ggg33_vvbbv"], "meta": ["123123", "3123123"], "isRequired": false}' --account-id xtest3.testnet --gas=300000000000000
 near view xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest3.testnet"}' --account-id xtest3.testnet
 near call xtest3.testnet publish_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "limit_participants": 200, "enroll_fee": "0", "start_date": "1612112400000", "end_date": "1675184400000", "black_list": [], "white_list": []}' --account-id xtest3.testnet
 near call xtest3.testnet unpublish_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K"}' --account-id xtest3.testnet
-near view xtest3.testnet get_element_count '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu"}' --account-id xtest3.testnet
+near view xtest3.testnet get_element_count '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f"}' --account-id xtest3.testnet
 
 near call xtest3.testnet join_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu"}' --account-id xtest3.testnet
 near call xtest3.testnet submit_answer '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "elementId": "8ArNoKHTUmLJCz7j6mhZqcSmkAE7WXALtnQPLtkLJUa29SPhX9PdrK2ssutouTELD3adyWg859gpgx9uwEUTS", "answer": ["123123"]}' --account-id xtest3.testnet --gas=300000000000000
-near call xtest3.testnet get_answer_statistical '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet --gas=300000000000000
+near call xtest3.testnet get_answer_statistical '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "anhhd.testnet", "page": 2}' --account-id xtest1.testnet --gas=300000000000000
+near view xtest3.testnet get_passed_element_count '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "gefi_hub.testnet", "page": 2}' --account-id xtest1.testnet
 
 near view xtest3.testnet get_forms '{"userId": "gefi_hub.testnet", "page": 1}' --account-id xtest3.testnet
 near view xtest3.testnet get_joined_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
 near view xtest3.testnet test '{"title": ["123", "123123", "345345"]}' --account-id xtest3.testnet
-near view xtest3.testnet get_elements '{"formId": "qCsqqzSCyGMNbXh3aLep8NJRntYn5i3XUfWEMi6JCGr9a1DSA", "userId": "mtoan2193.testnet", "page": 1}' --account-id xtest3.testnet
+near view xtest3.testnet get_elements '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f", "userId": "xtest3.testnet", "page": 2}' --account-id xtest3.testnet
 
+near view xtest3.testnet get_participant_form_status '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest3.testnet"}' --account-id xtest3.testnet
 
 near call xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "index": 1}' --account-id xtest3.testnet --gas=300000000000000
 

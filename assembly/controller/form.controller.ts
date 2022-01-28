@@ -91,3 +91,7 @@ export function unpublish_form(formId: string): bool {
 
     return existedForm.unpublish();
 }
+
+export function get_forms_count(): i32 {
+    return FormStorage.count();
+}
