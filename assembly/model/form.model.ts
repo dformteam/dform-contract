@@ -1,4 +1,4 @@
-import { base58, Context, u128, util } from "near-sdk-core";
+import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
 import PassedElement from "./passed_element";
@@ -284,7 +284,6 @@ class Form {
             this.status = FORM_STATUS.EDITING;
             this.start_date = 0;
             this.end_date = 0;
-            this.enroll_fee = u128.Zero;
             this.limit_participants = 0;
             BlackListStorage.deletes(this.id);
             WhiteListStorage.deletes(this.id);
@@ -293,10 +292,11 @@ class Form {
             for (let i = 0; i < participant_length; i++) {
                 const participant = ParticipantStorage.get(participants[i]);
                 if (participant != null) {
+                    ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
                     participant.remove_form(this.id);
                 }
             }
-
+            this.enroll_fee = u128.Zero;
             this.participants.clear();
             this.save();
             return true;
