@@ -98,3 +98,12 @@ export function unpublish_form(formId: string): bool {
 export function get_forms_count(): i32 {
     return FormStorage.count();
 }
+
+export function claim_reward(formId: string): u128 {
+    const existedForm = FormStorage.get(formId);
+    const sender = Context.sender;
+    if (existedForm == null || existedForm.get_owner() != sender) {
+        return u128.Zero;
+    }
+    return existedForm.claim();
+}

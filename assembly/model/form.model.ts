@@ -1,4 +1,4 @@
-import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
+import { base58, Context, u128, util, ContractPromiseBatch, logging } from "near-sdk-core";
 import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
 import PassedElement from "./passed_element";
@@ -24,6 +24,9 @@ export enum FORM_TYPE {
     CARD,
 }
 
+const DEAFULTS_WITHDRAW_FEE = 3; // %
+const TEMP_STORAGE_FEE = 1; // %
+
 @nearBindgen
 class Form {
     public id: string;
@@ -36,8 +39,10 @@ class Form {
     private end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
+    private participantsClaimed: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
+    private isClaimed: i32 = 0;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
@@ -56,6 +61,11 @@ class Form {
         if (this.participants == null) {
             this.participants = new Set<string>();
         }
+
+        if (this.participantsClaimed == null) {
+            this.participantsClaimed = new Set<string>();
+        }
+
         this.generate_id();
     }
 
@@ -139,6 +149,26 @@ class Form {
 
     public get_is_retry(): bool {
         return this.isRetry;
+    }
+
+    claim(): u128 {
+        let claimedAmount: u128 = u128.Zero;
+        for (let i = 0; i < this.participants.size; i++) {
+            let par: string = this.participants.values()[i];
+            if (!this.participantsClaimed.has(par)) {
+                this.participantsClaimed.add(par);
+                claimedAmount = u128.add(claimedAmount, this.enroll_fee);
+            }
+        }
+        logging.log(`claimedAmount = ${claimedAmount}`);
+        let reward: u128 = u128.div(claimedAmount, u128.from(100));
+        let totalPercentFee: u128 = u128.add(u128.from(DEAFULTS_WITHDRAW_FEE), u128.from(TEMP_STORAGE_FEE));
+        logging.log(`totalPercentFee = ${totalPercentFee}`);
+        reward = u128.mul(reward, u128.sub(u128.from(100), totalPercentFee));
+        logging.log(`reward = ${reward}`);
+        ContractPromiseBatch.create(this.owner).transfer(reward);
+        this.isClaimed = this.isClaimed + 1;
+        return reward;
     }
 
     get_title(): string {
