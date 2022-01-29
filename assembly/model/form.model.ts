@@ -156,7 +156,9 @@ class Form {
         }
         let reward: u128 = u128.div(claimedAmount, u128.from(100));
         reward = u128.mul(reward, u128.sub(u128.from(100), u128.from(DEAFULTS_WITHDRAW_FEE)));
-        ContractPromiseBatch.create(this.owner).transfer(reward);
+        let promise = ContractPromiseBatch.create(this.owner);
+        if (!promise) return u128.Zero;
+        promise.transfer(reward);
         this.isClaimed = true;
         this.save();
         return reward;
@@ -317,7 +319,10 @@ class Form {
             for (let i = 0; i < participant_length; i++) {
                 const participant = ParticipantStorage.get(participants[i]);
                 if (participant != null) {
-                    ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
+                    let promise = ContractPromiseBatch.create(participants[i]);
+                    // if(!promise) return false;
+                    // TODO Handle list error
+                    promise.transfer(this.enroll_fee);
                     participant.remove_form(this.id);
                 }
             }
