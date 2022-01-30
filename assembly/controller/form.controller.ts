@@ -1,21 +1,18 @@
-import { Context, u128 } from "near-sdk-core";
+import { Context, u128, ContractPromiseBatch } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
 import { FORM_TYPE } from "../model/form.model";
 import { FormStatusResponse } from "../model/response/form_status";
-import { FormStorage, UserFormStorage } from "../storage/form.storage";
-import { ContractPromiseBatch, logging } from "near-sdk-as";
+import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
 
 const FREE_FORM_MAX_NUM_PARTICIPANTS = 50;
-const CREATE_FORM_COST = "10000000000000000000"; // 1 NEAR
+const OVER_CREATE_FORM_FEE = "500000000000000000000000"; // 0.5 NEAR
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
     if (title == "") {
         return null;
     }
-    if (u128.lt(Context.attachedDeposit, u128.from(CREATE_FORM_COST))) {
-        return null;
-    }
+    if ((OwnerStorage.get(Context.sender) > 3) && (u128.lt(Context.attachedDeposit, u128.from(OVER_CREATE_FORM_FEE)))) return null;
     const newForm = new Form(title, description, type);
     newForm.save();
     return newForm.get_id();
@@ -114,19 +111,15 @@ export function unpublish_form(formId: string): bool {
     return existedForm.unpublish();
 }
 
-export function set_enroll_fee(formId: string, new_fee: u128): u128 | null {
-    const form = FormStorage.get(formId);
-    const sender = Context.sender;
-    if (form && (sender == form.get_owner())) {
-        return form.set_enroll_fee(new_fee);
-    }
-    return null;
+export function get_forms_count(): i32 {
+    return FormStorage.count();
 }
 
-export function get_enroll_fee(formId: string): u128 | null {
-    const form = FormStorage.get(formId);
-    if (form) {
-        return form.get_enroll_fee();
+export function claim_reward(formId: string): u128 {
+    const existedForm = FormStorage.get(formId);
+    const sender = Context.sender;
+    if (existedForm == null || existedForm.get_owner() != sender) {
+        return u128.Zero;
     }
-    return null;
+    return existedForm.claim();
 }

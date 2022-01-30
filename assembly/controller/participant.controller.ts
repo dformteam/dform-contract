@@ -16,10 +16,10 @@ export function get_joined_forms(userId: string, page: i32): PaginationResult<Pa
     return participant.get_joined_form(page);
 }
 
-export function get_joined_forms_count(userId: string) : i32 {
+export function get_joined_forms_count(userId: string): i32 {
     const participant = ParticipantStorage.get(userId);
-    
-    if (participant == null){
+
+    if (participant == null) {
         return 0;
     }
 
@@ -45,11 +45,15 @@ export function get_participant_form_status(userId: string, formId: string): Par
     return new ParticipantFormStatusResponse(userId, formId, participant.get_join_form_status(formId));
 }
 
-export function get_passed_element_count(userId: string, formId: string) : i32{
+export function get_passed_element_count(userId: string, formId: string): i32 {
     const participant_form_id = `${userId}_${formId}`;
     const participant_form = ParticipantFormStorage.get(participant_form_id);
-    if (participant_form == null){
+    if (participant_form == null) {
         return 0;
     }
     return participant_form.get_passed_element_count();
+}
+
+export function get_participants_count(): i32 {
+    return ParticipantStorage.count();
 }
