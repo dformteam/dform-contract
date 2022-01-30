@@ -6,13 +6,16 @@ import { FormStatusResponse } from "../model/response/form_status";
 import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
 
 const FREE_FORM_MAX_NUM_PARTICIPANTS = 50;
-const OVER_CREATE_FORM_FEE = "500000000000000000000000"; // 0.5 NEAR
+const OVER_CREATE_FORM_FEE = "500000000000000000000000";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
+    const sender = Context.sender;
     if (title == "") {
         return null;
     }
-    if ((OwnerStorage.get(Context.sender) > 3) && (u128.lt(Context.attachedDeposit, u128.from(OVER_CREATE_FORM_FEE)))) return null;
+    if (OwnerStorage.get(sender) > 3 && u128.lt(Context.attachedDeposit, u128.from(OVER_CREATE_FORM_FEE))) {
+        return null;
+    }
     const newForm = new Form(title, description, type);
     newForm.save();
     return newForm.get_id();
@@ -70,7 +73,7 @@ export function join_form(formId: string): bool {
     if (u128.lt(Context.attachedDeposit, existedForm.get_enroll_fee())) {
         return false;
     }
-    if (u128.eq(u128.Zero, existedForm.get_enroll_fee()) && (existedForm.get_current_num_participants() >= (FREE_FORM_MAX_NUM_PARTICIPANTS))) {
+    if (u128.eq(u128.Zero, existedForm.get_enroll_fee()) && existedForm.get_current_num_participants() >= FREE_FORM_MAX_NUM_PARTICIPANTS) {
         return false;
     }
     let join_stt = existedForm.join();

@@ -1,8 +1,6 @@
 import { PersistentUnorderedMap, PersistentVector } from "near-sdk-as";
-import { getPaginationOffset, pagination, PaginationResult } from "../helper/pagination.helper";
+import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
-import Participant from "../model/participant.model";
-import Question from "../model/element.model";
 
 const userFormPersit = new PersistentUnorderedMap<string, string>("uFP");
 const formPersit = new PersistentUnorderedMap<string, Form>("fP");
