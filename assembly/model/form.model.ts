@@ -1,5 +1,5 @@
 import { base58, Context, u128, util, ContractPromiseBatch, logging, env } from "near-sdk-core";
-import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
+import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
 import PassedElement from "./passed_element";
 import Participant from "./participant.model";
@@ -53,9 +53,6 @@ class Form extends Base {
         this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
-
-        let owner_total_form = OwnerStorage.get(this.owner);
-        OwnerStorage.set(this.owner, owner_total_form + 1);
 
         if (this.elements == null) {
             this.elements = new Set<string>();

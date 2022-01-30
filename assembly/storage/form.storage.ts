@@ -4,7 +4,6 @@ import Form from "../model/form.model";
 
 const userFormPersit = new PersistentUnorderedMap<string, string>("uFP");
 const formPersit = new PersistentUnorderedMap<string, Form>("fP");
-const ownerPersist = new PersistentUnorderedMap<string, i32>("owP");
 const formAnalysis = new PersistentUnorderedMap<string, PersistentVector<string>>("fA");
 export class FormStorage {
     static get(id: string): Form | null {
@@ -32,27 +31,6 @@ export class FormStorage {
 
     static count(): i32 {
         return formPersit.length;
-    }
-}
-
-export class OwnerStorage {
-    static get(id: string): i32 {
-        if (ownerPersist.contains(id)) {
-            return ownerPersist.getSome(id);
-        }
-        return 0;
-    }
-
-    static set(id: string, value: i32): void {
-        ownerPersist.set(id, value);
-    }
-
-    static contains(id: string): bool {
-        return ownerPersist.contains(id);
-    }
-
-    static delete(id: string): void {
-        ownerPersist.delete(id);
     }
 }
 
