@@ -1,5 +1,5 @@
-import { base58, Context, u128, util } from "near-sdk-core";
-import { FormStorage, UserFormStorage } from "../storage/form.storage";
+import { base58, Context, u128, util, ContractPromiseBatch, logging } from "near-sdk-core";
+import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
 import PassedElement from "./passed_element";
 import Participant from "./participant.model";
@@ -24,6 +24,9 @@ export enum FORM_TYPE {
     CARD,
 }
 
+const DEAFULTS_WITHDRAW_FEE = 3; // %
+const TEMP_STORAGE_FEE = "10000000000000000000000"; // // 0.01 NEAR = 1KB
+
 @nearBindgen
 class Form {
     public id: string;
@@ -36,14 +39,20 @@ class Form {
     private end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
+    // private participantsClaimed: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
+    private isClaimed: bool = false;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
         this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
+
+        let owner_total_form = OwnerStorage.get(this.owner);
+        OwnerStorage.set(this.owner, owner_total_form + 1);
+
 
         if (this.elements == null) {
             this.elements = new Set<string>();
@@ -52,6 +61,7 @@ class Form {
         if (this.participants == null) {
             this.participants = new Set<string>();
         }
+
         this.generate_id();
     }
 
@@ -135,6 +145,23 @@ class Form {
 
     public get_is_retry(): bool {
         return this.isRetry;
+    }
+
+    claim(): u128 {
+        if ((Context.blockTimestamp / 1000000) <= this.end_date || this.isClaimed) return u128.Zero;
+        let claimedAmount: u128 = u128.Zero;
+        for (let i = 0; i < this.participants.size; i++) {
+            // TODO: Specific storage fee after merge fee feature
+            claimedAmount = u128.add(claimedAmount, u128.sub(this.enroll_fee, u128.from(TEMP_STORAGE_FEE)));
+        }
+        let reward: u128 = u128.div(claimedAmount, u128.from(100));
+        reward = u128.mul(reward, u128.sub(u128.from(100), u128.from(DEAFULTS_WITHDRAW_FEE)));
+        let promise = ContractPromiseBatch.create(this.owner);
+        if (!promise) return u128.Zero;
+        promise.transfer(reward);
+        this.isClaimed = true;
+        this.save();
+        return reward;
     }
 
     get_title(): string {
@@ -284,7 +311,6 @@ class Form {
             this.status = FORM_STATUS.EDITING;
             this.start_date = 0;
             this.end_date = 0;
-            this.enroll_fee = u128.Zero;
             this.limit_participants = 0;
             BlackListStorage.deletes(this.id);
             WhiteListStorage.deletes(this.id);
@@ -293,10 +319,14 @@ class Form {
             for (let i = 0; i < participant_length; i++) {
                 const participant = ParticipantStorage.get(participants[i]);
                 if (participant != null) {
+                    let promise = ContractPromiseBatch.create(participants[i]);
+                    // if(!promise) return false;
+                    // TODO Handle list error
+                    promise.transfer(this.enroll_fee);
                     participant.remove_form(this.id);
                 }
             }
-
+            this.enroll_fee = u128.Zero;
             this.participants.clear();
             this.save();
             return true;

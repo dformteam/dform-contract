@@ -3,12 +3,15 @@ import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
 import { FORM_TYPE } from "../model/form.model";
 import { FormStatusResponse } from "../model/response/form_status";
-import { FormStorage, UserFormStorage } from "../storage/form.storage";
+import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
+
+const OVER_CREATE_FORM_FEE = "500000000000000000000000"; // 0.5 NEAR
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
     if (title == "") {
         return null;
     }
+    if ((OwnerStorage.get(Context.sender) > 3) && (u128.lt(Context.attachedDeposit, u128.from(OVER_CREATE_FORM_FEE)))) return null;
     const newForm = new Form(title, description, type);
     newForm.save();
     return newForm.get_id();
@@ -94,4 +97,13 @@ export function unpublish_form(formId: string): bool {
 
 export function get_forms_count(): i32 {
     return FormStorage.count();
+}
+
+export function claim_reward(formId: string): u128 {
+    const existedForm = FormStorage.get(formId);
+    const sender = Context.sender;
+    if (existedForm == null || existedForm.get_owner() != sender) {
+        return u128.Zero;
+    }
+    return existedForm.claim();
 }

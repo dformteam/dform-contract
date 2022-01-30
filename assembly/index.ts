@@ -122,3 +122,7 @@ export function get_participants_count(): i32 {
 export function get_forms_count(): i32 {
     return Form.get_forms_count();
 }
+
+export function claim_reward(formId: string): u128 {
+    return Form.claim_reward(formId);
+}
