@@ -1,21 +1,8 @@
 import { Context, u128 } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
-import { FORM_TYPE } from "../model/form.model";
 import { FormStatusResponse } from "../model/response/form_status";
-import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
-
-const OVER_CREATE_FORM_FEE = "500000000000000000000000"; // 0.5 NEAR
-
-export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
-    if (title == "") {
-        return null;
-    }
-    if ((OwnerStorage.get(Context.sender) > 3) && (u128.lt(Context.attachedDeposit, u128.from(OVER_CREATE_FORM_FEE)))) return null;
-    const newForm = new Form(title, description, type);
-    newForm.save();
-    return newForm.get_id();
-}
+import { FormStorage, UserFormStorage } from "../storage/form.storage";
 
 export function get_form(id: string): Form | null {
     return FormStorage.get(id);
@@ -59,14 +46,6 @@ export function delete_form(id: string): bool {
     }
     existedForm.remove();
     return true;
-}
-
-export function join_form(formId: string): bool {
-    const existedForm = FormStorage.get(formId);
-    if (existedForm == null) {
-        return false;
-    }
-    return existedForm.join();
 }
 
 export function publish_form(

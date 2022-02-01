@@ -1,8 +1,9 @@
-import { Context, logging } from "near-sdk-core";
+import { Context, logging, u128 } from "near-sdk-core";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { FormStorage } from "../storage/form.storage";
 import { ParticipantFormResponse } from "../model/response/participant_form";
+import Base from "./base.model";
 
 export enum ParticipantStatus {
     Banned,
@@ -42,7 +43,6 @@ class Participant {
 
     get_joined_form(page: i32): PaginationResult<ParticipantFormResponse> {
         const forms = this.forms.values();
-        logging.log(forms);
         const forms_length = forms.length;
         const paginationOffset = getPaginationOffset(forms_length, page);
 
@@ -87,6 +87,10 @@ class Participant {
     //     this.save();
     //     return this.lastSubmitTimestamp;
     // }
+
+    toString(): string {
+        return `{id: ${this.id}, status: ${this.status}, forms: ${this.forms}}`;
+    }
 
     save(): void {
         ParticipantStorage.set(this.id, this);

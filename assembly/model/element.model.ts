@@ -1,6 +1,8 @@
 import { base58, Context, util } from "near-sdk-core";
+import { u128 } from "near-sdk-as";
 import { eq_array } from "../helper/array";
 import { ElementStorage } from "../storage/element.storage";
+import Base from "./base.model";
 
 export enum ElementType {
     HEADER,
