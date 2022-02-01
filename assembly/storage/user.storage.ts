@@ -24,4 +24,8 @@ export class UserStorage {
             userPersist.delete(id);
         }
     }
+
+    static count(): i32 {
+        return userPersist.length;
+    }
 }
