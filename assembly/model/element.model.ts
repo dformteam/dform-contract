@@ -22,7 +22,7 @@ export enum ElementType {
 }
 
 @nearBindgen
-class Element extends Base {
+class Element {
     private id: string;
     private owner: string;
 
@@ -35,7 +35,6 @@ class Element extends Base {
         private nonce: i32,
         private numth: i32,
     ) {
-        super();
         this.owner = Context.sender;
         this.generate_id(formId);
     }
@@ -93,7 +92,6 @@ class Element extends Base {
     }
 
     save(): void {
-        this.cal_storage_fee(this.id, `${this}`);
         ElementStorage.set(this.id, this);
     }
 }

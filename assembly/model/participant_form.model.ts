@@ -5,7 +5,7 @@ import Base from "./base.model";
 import { ElementType } from "./element.model";
 
 @nearBindgen
-class ParticipantForm extends Base {
+class ParticipantForm {
     private id: string;
     private lastSubmitTimestamp: u64;
     private cashSpent: u128 = u128.from(0);
@@ -13,7 +13,6 @@ class ParticipantForm extends Base {
     private passed_element: Set<string>;
 
     constructor(private formId: string) {
-        super();
         if (this.passed_element == null) {
             this.passed_element = new Set<string>();
         }
@@ -48,16 +47,7 @@ class ParticipantForm extends Base {
     }
 
     get_passed_question(): i32 {
-        const elements = this.passed_element.values();
-        let count = 0;
-        for (let i = 0; i < elements.length; i++) {
-            const element = ElementStorage.get(elements[i]);
-            if (element != null && element.get_type() != ElementType.HEADER) {
-                count = count + 1;
-            }
-        }
-
-        return count;
+        return this.passed_element.size;
     }
 
     contain_passed_element(id: string): bool {
@@ -69,10 +59,8 @@ class ParticipantForm extends Base {
     }
 
     save(): void {
-        this.cal_storage_fee(this.id, this.toString());
         ParticipantFormStorage.set(this.id, this);
     }
-
 }
 
 export default ParticipantForm;

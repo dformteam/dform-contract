@@ -1,7 +1,7 @@
-import { PersistentUnorderedMap } from "near-sdk-as";
+import { logging, PersistentUnorderedMap } from "near-sdk-as";
 import User from "../model/user.model";
 
-const userPersist = new PersistentUnorderedMap<string, User>("uwP");
+const userPersist = new PersistentUnorderedMap<string, User>("uP");
 
 export class UserStorage {
     static get(id: string): User | null {

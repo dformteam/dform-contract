@@ -1,30 +1,8 @@
-import { Context, u128, ContractPromiseBatch } from "near-sdk-core";
+import { Context, u128 } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import Form from "../model/form.model";
-import { FORM_TYPE } from "../model/form.model";
 import { FormStatusResponse } from "../model/response/form_status";
-import User from "../model/user.model";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
-import { UserStorage } from "../storage/user.storage";
-
-const FREE_FORM_MAX_NUM_PARTICIPANTS = 50;
-
-export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
-    const sender = Context.sender;
-    if (title == "") {
-        return null;
-    }
-
-    let user = UserStorage.get(sender);
-    if (user == null) {
-        user = new User();
-    }
-
-    const formId = user.create_form(title, description, type);
-    user.save();
-
-    return formId;
-}
 
 export function get_form(id: string): Form | null {
     return FormStorage.get(id);
@@ -68,29 +46,6 @@ export function delete_form(id: string): bool {
     }
     existedForm.remove();
     return true;
-}
-
-export function join_form(formId: string): bool {
-    const existedForm = FormStorage.get(formId);
-    if (existedForm == null) {
-        return false;
-    }
-    if (u128.lt(Context.attachedDeposit, existedForm.get_enroll_fee())) {
-        return false;
-    }
-    if (u128.eq(u128.Zero, existedForm.get_enroll_fee()) && existedForm.get_current_num_participants() >= FREE_FORM_MAX_NUM_PARTICIPANTS) {
-        return false;
-    }
-    let join_stt = existedForm.join();
-    if (!existedForm.total_storage_fee) {
-        return false;
-    }
-    if (!u128.eq(u128.Zero, existedForm.get_enroll_fee()) && existedForm.total_storage_fee) {
-        let withdraw_token = u128.sub(Context.attachedDeposit, existedForm.total_storage_fee);
-        ContractPromiseBatch.create(existedForm.get_owner()).transfer(withdraw_token);
-    }
-
-    return true && join_stt;
 }
 
 export function publish_form(

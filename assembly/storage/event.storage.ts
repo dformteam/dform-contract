@@ -24,6 +24,8 @@ export class EventStorage {
     }
 
     static delete(id: string): void {
-        eventPersit.delete(id);
+        if (eventPersit.contains(id)) {
+            eventPersit.delete(id);
+        }
     }
 }

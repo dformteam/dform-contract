@@ -1,8 +1,7 @@
-import { base58, Context, u128, util, ContractPromiseBatch, logging, env } from "near-sdk-core";
+import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
 import PassedElement from "./passed_element";
-import Participant from "./participant.model";
 import Element from "./element.model";
 import ParticipantForm from "./participant_form.model";
 import { ElementType } from "./element.model";
@@ -13,7 +12,7 @@ import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import Base from "./base.model";
-import { calStorageFee, ComponentFee } from "../helper/calculation.helper";
+import { UserStorage } from "../storage/user.storage";
 
 export enum FORM_STATUS {
     EDITING,
@@ -30,7 +29,7 @@ const DEAFULTS_WITHDRAW_FEE = 3; // %
 const TEMP_STORAGE_FEE = "10000000000000000000000"; // // 0.01 NEAR = 1KB
 
 @nearBindgen
-class Form extends Base {
+class Form {
     public id: string;
     private owner: string;
     private status: FORM_STATUS;
@@ -41,14 +40,11 @@ class Form extends Base {
     public end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
-    // private participantsClaimed: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
-    public total_storage_fee: u128 = u128.Zero;
     private isClaimed: bool = false;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
-        super();
         this.owner = Context.sender;
         this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
@@ -247,43 +243,16 @@ class Form extends Base {
         }
     }
 
-    // set_element_title(element_id: string, new_title: string[]): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_title(new_title);
-    // }
-
-    // set_element_meta(element_id: string, new_meta: Set<string>): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_meta(new_meta);
-    // }
-
-    // set_element_required(element_id: string, new_required: bool): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_required(new_required);
-    // }
-
     save(): void {
-        this.cal_storage_fee(this.id, this.toString());
         FormStorage.set(this.id, this);
         UserFormStorage.set(this.owner, this.id);
-        // TODO: Tinh toan chi phi luu tru cho cac component nho
-        // let compFee: ComponentFee = {
-        //     id: `UserFormStorage`,
-        //     value: calStorageFee(this.owner, this.id)
-        // }
-        // this.componentStorageFee.push(compFee);
     }
 
     remove(): void {
+        const currentTimestamp = Context.blockTimestamp / 100000;
+        if (this.status === FORM_STATUS.STARTING && currentTimestamp < this.end_date) {
+            //need to refund for participant
+        }
         FormStorage.delete(this.id);
         UserFormStorage.delete(this.owner, this.id);
     }
@@ -330,13 +299,12 @@ class Form extends Base {
             const participants = this.participants.values();
             const participant_length = participants.length;
             for (let i = 0; i < participant_length; i++) {
-                const participant = ParticipantStorage.get(participants[i]);
+                const participant = UserStorage.get(participants[i]);
                 if (participant != null) {
-                    let promise = ContractPromiseBatch.create(participants[i]);
+                    ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
                     // if(!promise) return false;
                     // TODO Handle list error
-                    promise.transfer(this.enroll_fee);
-                    participant.remove_form(this.id);
+                    participant.remove_form_joined(this.id);
                 }
             }
             this.enroll_fee = u128.Zero;
@@ -365,22 +333,9 @@ class Form extends Base {
 
             this.participants.add(sender);
 
-            let participant = ParticipantStorage.get(sender);
-
-            if (participant == null) {
-                participant = new Participant();
-            }
-
-            participant.join_form(this.id);
-
-            participant.save();
-
             const participant_form = new ParticipantForm(this.id);
             participant_form.save();
             this.save();
-
-            let cur_participant_fee = u128.add(participant.get_storage_fee(), participant_form.get_storage_fee());
-            this.total_storage_fee = u128.add(cur_participant_fee, this.get_storage_fee());
 
             return true;
         }
@@ -511,8 +466,6 @@ class Form extends Base {
     get_current_num_participants(): i32 {
         return this.participants.size;
     }
-
-    publicAsATemplate(): void {}
 }
 
 export default Form;
