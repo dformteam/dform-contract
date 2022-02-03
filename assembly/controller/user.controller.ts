@@ -1,6 +1,7 @@
 import { Context, logging } from "near-sdk-as";
 import { EVENT_TYPE } from "../model/event.model";
 import { FORM_TYPE } from "../model/form.model";
+import UserDetailResponse from "../model/response/user_detail_response";
 import User from "../model/user.model";
 import { UserStorage } from "../storage/user.storage";
 
@@ -28,6 +29,8 @@ export function init_new_event(
     privacy: Set<string>,
     cover_image: string,
     event_type: EVENT_TYPE,
+    start_date: u64,
+    end_date: u64,
 ): string | null {
     if (name == "") {
         return null;
@@ -41,7 +44,7 @@ export function init_new_event(
         user.save();
     }
 
-    return user.create_event(name, location, description, privacy, cover_image, event_type);
+    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
 }
 
 export function join_form(formId: string): bool {
@@ -66,7 +69,7 @@ export function delete_form(formId: string): bool {
         return false;
     }
 
-    return user.delete_event(formId);
+    return user.delete_form(formId);
 }
 
 export function join_event(eventId: string): bool {
@@ -107,6 +110,20 @@ export function leave_event(eventId: string): bool {
     return user.leave_event(eventId);
 }
 
-export function get_user(userId: string): User | null {
-    return UserStorage.get(userId);
+export function get_user(userId: string): UserDetailResponse | null {
+    const user = UserStorage.get(userId);
+    if (user == null) {
+        return null;
+    }
+
+    return new UserDetailResponse(
+        userId,
+        user.get_status(),
+        user.get_income(),
+        user.get_outcome(),
+        user.get_form_owner_count(),
+        user.get_event_owner_count(),
+        user.get_form_joined_count(),
+        user.get_event_joined_count(),
+    );
 }
