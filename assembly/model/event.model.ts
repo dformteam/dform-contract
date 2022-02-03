@@ -1,4 +1,5 @@
 import { base58, Context, ContractPromiseBatch, logging, u128, util } from "near-sdk-as";
+import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { BlackListStorage } from "../storage/black_list.storage";
 import { EventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
@@ -34,10 +35,9 @@ class Event {
     private participants: Set<string>;
     private interests: Set<string>;
     private limit_participants: i32;
-    private start_date: u64;
-    private end_date: u64;
+    private register_start_date: u64;
+    private register_end_date: u64;
     private status: EVENT_STATUS;
-    // private media: Set<string>;
     constructor(
         private name: string,
         private location: string,
@@ -45,6 +45,8 @@ class Event {
         private privacy: Set<string>,
         private cover_image: string,
         private event_type: EVENT_TYPE,
+        private start_date: u64,
+        private end_date: u64,
     ) {
         this.created_at = Context.blockTimestamp / 1000000;
         this.owner = Context.sender;
@@ -93,6 +95,30 @@ class Event {
         return this;
     }
 
+    set_start_date(value: u64): Event {
+        if (this.start_date !== value) {
+            this.start_date = value;
+        }
+
+        return this;
+    }
+
+    set_end_date(value: u64): Event {
+        if (this.end_date !== value) {
+            this.end_date = value;
+        }
+
+        return this;
+    }
+
+    set_type(value: EVENT_TYPE): Event {
+        if (this.event_type !== value) {
+            this.event_type = value;
+        }
+
+        return this;
+    }
+
     private generate_id(): void {
         let eventId: string = "";
         while (eventId == "") {
@@ -107,9 +133,9 @@ class Event {
 
     publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>): bool {
         if (this.status == EVENT_STATUS.EDITING) {
-            this.start_date = start_date;
+            this.register_start_date = start_date;
+            this.register_end_date = end_date;
             this.limit_participants = limit_participants;
-            this.end_date = end_date;
             this.enroll_fee = enroll_fee;
             this.status = EVENT_STATUS.STARTING;
             BlackListStorage.sets(this.id, black_list);
@@ -122,10 +148,10 @@ class Event {
 
     unpublish(): bool {
         const currentTimestamp = Context.blockTimestamp / 1000000;
-        if (this.status != EVENT_STATUS.EDITING && currentTimestamp < this.end_date) {
+        if (this.status != EVENT_STATUS.EDITING && currentTimestamp < this.register_end_date) {
             this.status = EVENT_STATUS.EDITING;
-            this.start_date = 0;
-            this.end_date = 0;
+            this.register_start_date = 0;
+            this.register_end_date = 0;
             this.limit_participants = 0;
             BlackListStorage.deletes(this.id);
             WhiteListStorage.deletes(this.id);
@@ -203,7 +229,7 @@ class Event {
     leave_event(): bool {
         const sender = Context.sender;
         const currentTimestamp = Context.blockTimestamp / 100000;
-        if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.end_date) {
+        if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.register_end_date) {
             if (this.participants.has(sender)) {
                 //TODO: need to refund
                 const refund_amount = u128.div(u128.mul(this.enroll_fee, u128.from("90")), u128.from("100"));
@@ -258,9 +284,51 @@ class Event {
         return this.enroll_fee;
     }
 
+    get_limit_participant(): i32 {
+        return this.limit_participants;
+    }
+
+    get_status(): EVENT_STATUS {
+        return this.status;
+    }
+
+    get_privacy(): Set<string> {
+        return this.privacy;
+    }
+
+    get_type(): EVENT_TYPE {
+        return this.event_type;
+    }
+
+    get_register_start_date(): u64 {
+        return this.register_start_date;
+    }
+
+    get_register_end_date(): u64 {
+        return this.register_end_date;
+    }
+
+    get_participants(page: i32): PaginationResult<string> {
+        const participant = this.participants.values();
+        const participant_length = participant.length;
+        if (participant_length == 0) {
+            return new PaginationResult(1, 0, new Array<string>(0));
+        }
+        const pagination_offset = getPaginationOffset(participant_length, page);
+        const start_index = pagination_offset.startIndex;
+        const end_index = pagination_offset.endIndex;
+        const result = new Set<string>();
+
+        for (let i = start_index; i >= end_index; i--) {
+            result.add(participant[i]);
+        }
+
+        return new PaginationResult(page, participant_length, result.values());
+    }
+
     remove(): void {
         const currentTimestamp = Context.blockTimestamp / 100000;
-        if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.end_date) {
+        if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.register_end_date) {
             // Need to refund to participant
         }
         EventStorage.delete(this.id);

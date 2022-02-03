@@ -40,25 +40,20 @@ class User {
         this.holding = u128.Zero;
         this.status = USER_STATUS.ACTIVE;
         this.created_at = Context.blockTimestamp / 1000000;
-        // if (this.forms_owner == null) {
-        //     this.forms_owner = new Set<string>();
-        // }
+        if (this.forms_owner == null) {
+            this.forms_owner = new Set<string>();
+        }
+        if (this.events_owner == null) {
+            this.events_owner = new Set<string>();
+        }
 
-        this.forms_owner = new Set<string>();
-        this.events_owner = new Set<string>();
-        this.forms_joined = new Set<string>();
-        this.events_joined = new Set<string>();
-        // if (this.events_owner == null) {
-        //     this.events_owner = new Set<string>();
-        // }
+        if (this.forms_joined == null) {
+            this.forms_joined = new Set<string>();
+        }
 
-        // if (this.forms_joined == null) {
-        //     this.forms_joined = new Set<string>();
-        // }
-
-        // if (this.events_joined == null) {
-        //     this.events_joined = new Set<string>();
-        // }
+        if (this.events_joined == null) {
+            this.events_joined = new Set<string>();
+        }
     }
 
     set_status(status: USER_STATUS): void {
@@ -72,10 +67,6 @@ class User {
     get_join_form_status(formId: string): bool {
         return this.forms_joined.has(formId);
     }
-
-    // get_storage_fee(): u128 {
-    //     return this.storageFee;
-    // }
 
     get_joined_form(page: i32): PaginationResult<ParticipantFormResponse> {
         const forms = this.forms_joined.values();
@@ -106,6 +97,30 @@ class User {
 
     get_joined_form_count(): i32 {
         return this.forms_joined.size;
+    }
+
+    get_income(): u128 {
+        return this.income;
+    }
+
+    get_outcome(): u128 {
+        return this.outcome;
+    }
+
+    get_form_owner_count(): i32 {
+        return this.forms_owner.size;
+    }
+
+    get_event_owner_count(): i32 {
+        return this.events_owner.size;
+    }
+
+    get_form_joined_count(): i32 {
+        return this.forms_joined.size;
+    }
+
+    get_event_joined_count(): i32 {
+        return this.events_joined.size;
     }
 
     remove_form_joined(form_id: string): void {
@@ -188,6 +203,8 @@ class User {
         privacy: Set<string>,
         cover_image: string,
         event_type: EVENT_TYPE,
+        start_date: u64,
+        end_date: u64,
     ): string | null {
         const deposit = Context.attachedDeposit;
         const sender = Context.sender;
@@ -202,7 +219,7 @@ class User {
             ContractPromiseBatch.create(sender).transfer(refund_amount);
         }
 
-        const newEvent = new Event(name, location, description, privacy, cover_image, event_type);
+        const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
         newEvent.save();
         this.events_owner.add(newEvent.get_id());
         this.save();

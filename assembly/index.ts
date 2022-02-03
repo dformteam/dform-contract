@@ -18,6 +18,8 @@ import { EVENT_TYPE } from "./model/event.model";
 import EventModel from "./model/event.model";
 import { ParticipantFormStatusResponse } from "./model/response/participant_form_status";
 import UserModel from "./model/user.model";
+import EventDetailResponse from "./model/response/event_detail_response";
+import UserDetailResponse from "./model/response/user_detail_response";
 
 //USER
 
@@ -34,14 +36,16 @@ export function delete_form(id: string): bool {
 }
 
 export function init_new_event(
-    name: string,
+    title: string,
     location: string,
     description: Set<string>,
     privacy: Set<string>,
     cover_image: string,
     type: EVENT_TYPE,
+    start_date: u64,
+    end_date: u64,
 ): string | null {
-    return User.init_new_event(name, location, description, privacy, cover_image, type);
+    return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date);
 }
 
 export function join_event(eventId: string): bool {
@@ -52,7 +56,7 @@ export function leave_event(eventId: string): bool {
     return User.leave_event(eventId);
 }
 
-export function get_user(userId: string): UserModel | null {
+export function get_user(userId: string): UserDetailResponse | null {
     return User.get_user(userId);
 }
 
@@ -142,12 +146,21 @@ export function test(title: Set<string>): void {
     logging.log(title.values());
 }
 
-export function get_event(eventId: string): EventModel | null {
+export function get_event(eventId: string): EventDetailResponse | null {
     return Event.get_event(eventId);
 }
 
-export function update_event_info(eventId: string, title: string, description: Set<string>, location: string, cover_img: string): EventModel | null {
-    return Event.update_event_info(eventId, title, description, location, cover_img);
+export function update_event_info(
+    eventId: string,
+    title: string,
+    description: Set<string>,
+    location: string,
+    cover_img: string,
+    start_date: u64,
+    end_date: u64,
+    type: EVENT_TYPE,
+): EventModel | null {
+    return Event.update_event_info(eventId, title, description, location, cover_img, start_date, end_date, type);
 }
 
 export function publish_event(
@@ -196,4 +209,8 @@ export function claim_reward(formId: string): u128 {
 
 export function unpublish_event(eventId: string): bool {
     return Event.unpublish_event(eventId);
+}
+
+export function get_event_participants(eventId: string, page: i32): PaginationResult<string> {
+    return Event.get_participants(eventId, page);
 }
