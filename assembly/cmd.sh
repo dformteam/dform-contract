@@ -33,21 +33,21 @@ near view mtoan2111.testnet get_elements '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBD
 near call mtoan2111.testnet delete_element '{"id":"FpT3nqdVbtLzUgDivzP36FLrimTFT8xpLKmLFcnEnmaPPMS7jqsd2CMTZxWnHKd7kLqUYL9adE4zpoynW5QphCrtjJgbW"}' --account-id mtoan2111.testnet --gas=300000000000000
 
 near call neutrino.testnet init_new_form '{\"title\": \"test_dep\", \"description\":\"formtest\", \"type\": 0}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_form '{\"id\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet 
-near call neutrino.testnet unpublish_form '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_form '{\"id\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\"}' --account-id neutrino.testnet 
+near call neutrino.testnet unpublish_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\"}' --account-id neutrino.testnet --gas=300000000000000
 
-near call neutrino.testnet publish_form '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1643461271000\", \"end_date\": \"1643461274277\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet publish_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1643461271000\", \"end_date\": \"1643461274277\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet --gas=300000000000000
 
-near call neutrino.testnet new_element '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"type\": 1, \"title\": \"q_test2222333\", \"meta\": \"123123; 3123123\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_element '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"index\": 1}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet join_form '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet --deposit 1 --gas=300000000000000
-near call neutrino.testnet get_participant_detail '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"userId\":\"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_participants_detail '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"page\":0}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet update_participant_status '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"userId\":\"neutrino.testnet\", \"status\":0}' --account-id neutrino.testnet --gas=300000000000000
-near call neutrino.testnet get_enroll_fee '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet
-near call neutrino.testnet set_enroll_fee '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"new_fee\": \"1000000000000000000000000\"}' --account-id neutrino.testnet
-near view neutrino.testnet get_participants '{"formId": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"page\": 1}' --account-id neutrino.testnet
-near call neutrino.testnet claim_reward '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet
+near call neutrino.testnet new_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"type\": 1, \"title\": \"q_test2222333\", \"meta\": \"123123; 3123123\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_element '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"index\": 1}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet join_form '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\"}' --account-id neutrino.testnet --deposit 1 --gas=300000000000000
+near call neutrino.testnet get_participant_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"userId\":\"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_participants_detail '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"page\":0}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet update_participant_status '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"userId\":\"neutrino.testnet\", \"status\":0}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\"}' --account-id neutrino.testnet
+near call neutrino.testnet set_enroll_fee '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"new_fee\": \"1000000000000000000000000\"}' --account-id neutrino.testnet
+near view neutrino.testnet get_participants '{"formId": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\", \"page\": 1}' --account-id neutrino.testnet
+near call neutrino.testnet claim_reward '{\"formId\": \"C1tbALg81eAv864kXLhRtnboYtGncBDiamyX8daNYnyW6Pk4\"}' --account-id neutrino.testnet
 
 
 # event

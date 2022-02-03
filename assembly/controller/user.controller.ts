@@ -1,5 +1,7 @@
 import { Context, logging } from "near-sdk-as";
+import { PAGE_SIZE, PaginationResult } from "../helper/pagination.helper";
 import { EVENT_TYPE } from "../model/event.model";
+import Event from "../model/event.model";
 import { FORM_TYPE } from "../model/form.model";
 import UserDetailResponse from "../model/response/user_detail_response";
 import User from "../model/user.model";
@@ -126,4 +128,20 @@ export function get_user(userId: string): UserDetailResponse | null {
         user.get_form_joined_count(),
         user.get_event_joined_count(),
     );
+}
+
+export function get_owned_events(userId: string, page: i32): PaginationResult<Event> | null {
+    const user = UserStorage.get(userId);
+    if (user == null) {
+        return null;
+    }
+    return user.get_owned_events(page);
+}
+
+export function get_particippated_events(userId: string, page: i32): PaginationResult<Event> | null {
+    const user = UserStorage.get(userId);
+    if (user == null) {
+        return null;
+    }
+    return user.get_participated_events(page);
 }

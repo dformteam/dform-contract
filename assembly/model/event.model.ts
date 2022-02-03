@@ -173,9 +173,8 @@ class Event {
     }
 
     public toString(): string {
-        return `{id: ${this.id}, owner: ${this.owner}, description: ${
-            this.description
-        }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
+        return `{id: ${this.id}, owner: ${this.owner}, description: ${this.description
+            }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
     }
 
     get_id(): string {
@@ -219,7 +218,6 @@ class Event {
             }
 
             this.participants.add(sender);
-
             this.save();
             return true;
         }

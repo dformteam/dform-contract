@@ -301,6 +301,30 @@ class User {
     private isHalfNear(value: u128): bool {
         return u128.eq(value, u128.from(OVER_CREATE_FORM_FEE));
     }
+
+    get_owned_events(page: i32): PaginationResult<Event> {
+        const ret: Set<Event> = new Set<Event>();
+        const events = this.events_owner.values();
+        for (let i: i32 = 0; i < this.events_owner.size; i++) {
+            let current_event: Event | null = EventStorage.get(events[i]);
+            if (current_event) {
+                ret.add(current_event);
+            }
+        }
+        return new PaginationResult<Event>(page, this.events_owner.size, ret.values());
+    }
+
+    get_participated_events(page: i32): PaginationResult<Event> {
+        const ret: Set<Event> = new Set<Event>();
+        const events = this.events_joined.values();
+        for (let i: i32 = 0; i < this.events_joined.size; i++) {
+            let current_event: Event | null = EventStorage.get(events[i]);
+            if (current_event) {
+                ret.add(current_event);
+            }
+        }
+        return new PaginationResult<Event>(page, this.events_joined.size, ret.values());
+    }
 }
 
 export default User;

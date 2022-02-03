@@ -214,3 +214,11 @@ export function unpublish_event(eventId: string): bool {
 export function get_event_participants(eventId: string, page: i32): PaginationResult<string> {
     return Event.get_participants(eventId, page);
 }
+
+export function get_owned_events(userId: string, page: i32): PaginationResult<EventModel> | null {
+    return User.get_owned_events(userId, page);
+}
+
+export function get_particippated_events(userId: string, page: i32): PaginationResult<EventModel> | null {
+    return User.get_particippated_events(userId, page);
+}
