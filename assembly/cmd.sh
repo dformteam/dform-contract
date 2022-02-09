@@ -55,16 +55,18 @@ near call neutrino.testnet claim_reward '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21n
 near call xtest1.testnet init_new_event '{"name": "test_dep", "description":["formtest"], "location": "Hanoi", "privacy": [""], "cover_image": "", "type": 0}' --account-id xtest1.testnet --gas=300000000000000 --deposit 1
 near view xtest1.testnet get_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest1.testnet
 near call xtest1.testnet publish_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi", "limit_participants": 200, "enroll_fee": "1000000000000000000000000", "start_date": "1612112400000", "end_date": "1675184400000", "black_list": [], "white_list": []}' --account-id xtest1.testnet
-near call xtest1.testnet join_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest3.testnet --deposit 1
+near call xtest1.testnet join_event '{"eventId": "GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvEu6ty8wBCVXdzbWpEyFJ"}' --account-id xtest3.testnet --deposit 1
 near view xtest1.testnet get_user '{"userId": "xtest3.testnet"}' --account-id xtest1.testnet
 near call xtest1.testnet unpublish_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest1.testnet
 
 
-near call xtest1.testnet init_new_event '{\"title\": \"test_dep\", \"location\": \"Hanoi\", \"description\":[\"formtest\"], \"privacy\": [\"\"], \"cover_image\": \"\", \"type\": 0, \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\"}' --account-id neutrino.testnet --gas=300000000000000 --deposit 1
-near call xtest1.testnet get_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvDGccKD5zmAPoskS2WhtB\"}' --account-id neutrino.testnet
-near call neutrino.testnet publish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet
-near call neutrino.testnet join_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\"}' --account-id neutrino.testnet --deposit 1
-near call neutrino.testnet get_user '{\"userId\": \"gefi_hub.testnet\"}' --account-id neutrino.testnet
-near call neutrino.testnet unpublish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\"}' --account-id neutrino.testnet
+near call neutrino.testnet init_new_event '{\"title\": \"test_dep\", \"location\": \"Hanoi\", \"description\":[\"formtest\"], \"privacy\": [\"\"], \"cover_image\": \"\", \"type\": 0, \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\"}' --account-id neutrino.testnet --gas=300000000000000 --deposit 1
+near call neutrino.testnet get_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\"}' --account-id neutrino.testnet
+near call neutrino.testnet publish_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet
+near call neutrino.testnet join_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\"}' --account-id neutrino.testnet --deposit 1
+near call neutrino.testnet get_user '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
+near call neutrino.testnet unpublish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvEtjphkfEPmxVsixrJFyx\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_owned_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet get_particippated_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
+near call neutrino.testnet get_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
+near call neutrino.testnet get_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet

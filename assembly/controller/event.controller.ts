@@ -3,7 +3,7 @@ import { PaginationResult } from "../helper/pagination.helper";
 import { EVENT_TYPE } from "../model/event.model";
 import Event from "../model/event.model";
 import EventDetailResponse from "../model/response/event_detail_response";
-import { EventStorage } from "../storage/event.storage";
+import { EventStorage, UserEventStorage } from "../storage/event.storage";
 
 export function get_event(eventId: string): EventDetailResponse | null {
     const event = EventStorage.get(eventId);
@@ -29,6 +29,11 @@ export function get_event(eventId: string): EventDetailResponse | null {
         event.get_register_end_date(),
     );
 }
+
+export function get_events(userId: string, page: i32): PaginationResult<Event> {
+    return UserEventStorage.gets(userId, page);
+}
+
 
 export function update_event_info(
     eventId: string,
@@ -66,6 +71,11 @@ export function get_enroll_fee(eventId: string): u128 | null {
 
     return event.get_enroll_fee();
 }
+
+export function get_event_count(userId: string): i32 {
+    return UserEventStorage.count(userId);
+}
+
 
 export function get_participants(eventId: string, page: i32): PaginationResult<string> {
     const event = EventStorage.get(eventId);

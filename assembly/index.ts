@@ -150,6 +150,14 @@ export function get_event(eventId: string): EventDetailResponse | null {
     return Event.get_event(eventId);
 }
 
+export function get_events(userId: string, page: i32): PaginationResult<EventModel> {
+    return Event.get_events(userId, page);
+}
+
+export function get_event_count(userId: string): i32 {
+    return Event.get_event_count(userId);
+}
+
 export function update_event_info(
     eventId: string,
     title: string,

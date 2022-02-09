@@ -1,7 +1,7 @@
 import { base58, Context, ContractPromiseBatch, logging, u128, util } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { BlackListStorage } from "../storage/black_list.storage";
-import { EventStorage } from "../storage/event.storage";
+import { EventStorage, UserEventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
 import { UserStorage } from "../storage/user.storage";
 import { WhiteListStorage } from "../storage/white_list.storage";
@@ -173,9 +173,8 @@ class Event {
     }
 
     public toString(): string {
-        return `{id: ${this.id}, owner: ${this.owner}, description: ${
-            this.description
-        }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
+        return `{id: ${this.id}, owner: ${this.owner}, description: ${this.description
+            }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
     }
 
     get_id(): string {
@@ -332,10 +331,12 @@ class Event {
             // Need to refund to participant
         }
         EventStorage.delete(this.id);
+        UserEventStorage.delete(this.owner, this.id);
     }
 
     save(): void {
         EventStorage.set(this.id, this);
+        UserEventStorage.set(this.owner, this.id);
     }
 }
 
