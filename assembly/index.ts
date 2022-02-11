@@ -154,6 +154,10 @@ export function get_events(userId: string, page: i32): PaginationResult<EventMod
     return Event.get_events(userId, page);
 }
 
+export function get_newest_events(): PaginationResult<EventModel> {
+    return Event.get_newest_events();
+}
+
 export function get_event_count(userId: string): i32 {
     return Event.get_event_count(userId);
 }
@@ -195,7 +199,7 @@ export function delete_event(eventId: string): bool {
     return Event.delete_event(eventId);
 }
 
-export function interest_event(eventId: string): bool {
+export function interest_event(eventId: string): string | null {
     return Event.interest_event(eventId);
 }
 

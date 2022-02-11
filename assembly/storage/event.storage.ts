@@ -1,9 +1,10 @@
-import { PersistentUnorderedMap } from "near-sdk-as";
+import { logging, PersistentUnorderedMap, PersistentVector } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import Event from "../model/event.model";
 
 const eventPersit = new PersistentUnorderedMap<string, Event>("fE");
 const userEventPersit = new PersistentUnorderedMap<string, string>("uEP");
+const newestEventPersit = new PersistentVector<string>("nEPV")
 
 export class EventStorage {
     static get(id: string): Event | null {
@@ -31,7 +32,6 @@ export class EventStorage {
         }
     }
 }
-
 
 export class UserEventStorage {
     static gets(id: string, page: i32): PaginationResult<Event> {
@@ -113,3 +113,46 @@ export class UserEventStorage {
     }
 }
 
+export class NewestEventStorage {
+    static get(idx: i32): string | null {
+        if (idx < newestEventPersit.length) {
+            return newestEventPersit[idx];
+        }
+        return null;
+    }
+
+    static gets(): PaginationResult<Event> {
+        const eventSize = newestEventPersit.length;
+        const ret: Set<Event> = new Set<Event>();
+
+        for (let i = 0; i < eventSize; i++) {
+            if (eventPersit.contains(newestEventPersit[i])) {
+                const eventDetails = eventPersit.getSome(newestEventPersit[i]);
+                ret.add(eventDetails);
+            }
+        }
+        return new PaginationResult<Event>(0, eventSize, ret.values());
+    }
+
+    static push(eventId: string): string[] | null {
+        let temp_list: string[] = [];
+        for (let i = 0; i < newestEventPersit.length; i++) {
+            temp_list.push(newestEventPersit[i]);
+        }
+        if (temp_list.includes(eventId)) {
+            return null;
+        }
+        while (newestEventPersit.length > 0) {
+            newestEventPersit.pop();
+        }
+        temp_list.unshift(eventId);
+        while (temp_list.length > 5) {
+            temp_list.pop();
+        }
+        for (let i = 0; i < temp_list.length; i++) {
+            newestEventPersit.push(temp_list[i]);
+        }
+        return temp_list;
+    }
+
+}

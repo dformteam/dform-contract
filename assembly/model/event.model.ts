@@ -1,7 +1,7 @@
 import { base58, Context, ContractPromiseBatch, logging, u128, util } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { BlackListStorage } from "../storage/black_list.storage";
-import { EventStorage, UserEventStorage } from "../storage/event.storage";
+import { EventStorage, NewestEventStorage, UserEventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
 import { UserStorage } from "../storage/user.storage";
 import { WhiteListStorage } from "../storage/white_list.storage";
@@ -140,6 +140,7 @@ class Event {
             this.status = EVENT_STATUS.STARTING;
             BlackListStorage.sets(this.id, black_list);
             WhiteListStorage.sets(this.id, white_list);
+            NewestEventStorage.push(this.id);
             this.save();
             return true;
         }

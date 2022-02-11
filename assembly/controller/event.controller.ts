@@ -3,7 +3,7 @@ import { PaginationResult } from "../helper/pagination.helper";
 import { EVENT_TYPE } from "../model/event.model";
 import Event from "../model/event.model";
 import EventDetailResponse from "../model/response/event_detail_response";
-import { EventStorage, UserEventStorage } from "../storage/event.storage";
+import { EventStorage, NewestEventStorage, UserEventStorage } from "../storage/event.storage";
 
 export function get_event(eventId: string): EventDetailResponse | null {
     const event = EventStorage.get(eventId);
@@ -115,12 +115,18 @@ export function delete_event(id: string): bool {
     return true;
 }
 
-export function interest_event(eventId: string): bool {
+export function interest_event(eventId: string): string | null {
     const event = EventStorage.get(eventId);
     if (event == null) {
-        return false;
+        return null;
     }
-    return event.interest();
+    if (event.interest()) {
+        return 'Interested';
+    } else if (event.not_interest()) {
+        return 'Disinterested'
+    } else {
+        return null;
+    }
 }
 
 export function not_interest_event(eventId: string): bool {
@@ -157,4 +163,8 @@ export function unpublish_event(eventId: string): bool {
     }
 
     return existedEvent.unpublish();
+}
+
+export function get_newest_events(): PaginationResult<Event> {
+    return NewestEventStorage.gets();
 }

@@ -61,12 +61,13 @@ near call xtest1.testnet unpublish_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8
 
 
 near call neutrino.testnet init_new_event '{\"title\": \"test_dep\", \"location\": \"Hanoi\", \"description\":[\"formtest\"], \"privacy\": [\"\"], \"cover_image\": \"\", \"type\": 0, \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\"}' --account-id neutrino.testnet --gas=300000000000000 --deposit 1
-near call neutrino.testnet get_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\"}' --account-id neutrino.testnet
-near call neutrino.testnet publish_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet
-near call neutrino.testnet join_event '{\"eventId\": \"nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvnaYUZisxs1LaUEqe5Aahv\"}' --account-id neutrino.testnet --deposit 1
+near call neutrino.testnet get_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvGZo2wsGmRbZwGcU1t399\"}' --account-id neutrino.testnet
+near call neutrino.testnet publish_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49o2SsjVT8LxrkA7dsdLTtDF\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet
+near call neutrino.testnet join_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvGZo2wsGmRbZwGcU1t399\"}' --account-id neutrino.testnet --deposit 1
 near call neutrino.testnet get_user '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
 near call neutrino.testnet unpublish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvEtjphkfEPmxVsixrJFyx\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_owned_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet get_particippated_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet get_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
+near call neutrino.testnet get_newest_events '{}' --account-id neutrino.testnet --gas=300000000000000
