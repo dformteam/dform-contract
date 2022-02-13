@@ -31,6 +31,7 @@ export function init_new_event(
     event_type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
+    url: string
 ): string | null {
     if (name == "") {
         return null;
@@ -44,7 +45,7 @@ export function init_new_event(
         user.save();
     }
 
-    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
+    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
 }
 
 export function join_form(formId: string): bool {

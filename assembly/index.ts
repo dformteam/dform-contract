@@ -44,8 +44,9 @@ export function init_new_event(
     type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
+    url: string
 ): string | null {
-    return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date);
+    return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date, url);
 }
 
 export function join_event(eventId: string): bool {
@@ -162,6 +163,10 @@ export function get_event_count(userId: string): i32 {
     return Event.get_event_count(userId);
 }
 
+export function get_interested_event_count(userId: string): i32 {
+    return Event.get_interested_event_count(userId);
+}
+
 export function update_event_info(
     eventId: string,
     title: string,
@@ -171,8 +176,9 @@ export function update_event_info(
     start_date: u64,
     end_date: u64,
     type: EVENT_TYPE,
+    url: string
 ): EventModel | null {
-    return Event.update_event_info(eventId, title, description, location, cover_img, start_date, end_date, type);
+    return Event.update_event_info(eventId, title, description, location, cover_img, start_date, end_date, type, url);
 }
 
 export function publish_event(
@@ -203,8 +209,12 @@ export function interest_event(eventId: string): string | null {
     return Event.interest_event(eventId);
 }
 
-export function not_interest_event(eventId: string): bool {
-    return Event.not_interest_event(eventId);
+// export function not_interest_event(eventId: string): bool {
+//     return Event.not_interest_event(eventId);
+// }
+
+export function get_interested_events(userId: string, page: i32): PaginationResult<EventModel> {
+    return Event.get_interested_events(userId, page);
 }
 
 export function get_passed_element_count(userId: string, formId: string): i32 {

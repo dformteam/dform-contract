@@ -47,6 +47,7 @@ class Event {
         private event_type: EVENT_TYPE,
         private start_date: u64,
         private end_date: u64,
+        private url: string
     ) {
         this.created_at = Context.blockTimestamp / 1000000;
         this.owner = Context.sender;
@@ -94,6 +95,15 @@ class Event {
 
         return this;
     }
+
+    set_public_url(value: string): Event {
+        if (value !== "" && this.url !== value) {
+            this.url = value;
+        }
+
+        return this;
+    }
+
 
     set_start_date(value: u64): Event {
         if (this.start_date !== value) {
@@ -254,6 +264,10 @@ class Event {
 
     get_cover_image(): string {
         return this.cover_image;
+    }
+
+    get_public_url(): string {
+        return this.url;
     }
 
     get_number_of_participants(): i32 {

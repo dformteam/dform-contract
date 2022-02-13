@@ -205,6 +205,7 @@ class User {
         event_type: EVENT_TYPE,
         start_date: u64,
         end_date: u64,
+        url: string
     ): string | null {
         const deposit = Context.attachedDeposit;
         const sender = Context.sender;
@@ -219,7 +220,7 @@ class User {
             ContractPromiseBatch.create(sender).transfer(refund_amount);
         }
 
-        const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
+        const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
         newEvent.save();
         this.events_owner.add(newEvent.get_id());
         this.save();
