@@ -30,7 +30,7 @@ near view mtoan2111.testnet get_element '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBDA
 near call mtoan2111.testnet get_answer_statistical '{"formId": "cnPNVXsuPbXGrieN8SpJKSb9yMD7LqKLwBPvBeVqpHL82", "userId": "xtest6.testnet", "page": 1}' --account-id mtoan2111.testnet --gas=300000000000000
 near view mtoan2111.testnet get_participants '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBDA5oKTYsPrSLAAsLpUZZzcEt", "page": 1}' --account-id mtoan2111.testnet
 near view mtoan2111.testnet get_elements '{"formId": "qCsqqzSCyFzHgKCED2yfi7NDBDA5gJBxZeqzpXWbSZWx8RsQb", "userId": "mtoan2111.testnet", "page": 1}' --account-id mtoan2111.testnet
-near call mtoan2111.testnet delete_element '{"id":"FpT3nqdVbtLzUgDivzP36FLrimTFT8xpLKmLFcnEnmaPPMS7jqsd2CMTZxWnHKd7kLqUYL9adE4zpoynW5QphCrtjJgbW"}' --account-id mtoan2111.testnet --gas=300000000000000
+near call mtoan2111.testnet delete_element '{"id":"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn"}' --account-id mtoan2111.testnet --gas=300000000000000
 
 near call neutrino.testnet init_new_form '{\"title\": \"test_dep\", \"description\":\"formtest\", \"type\": 0}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet get_form '{\"id\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet 
@@ -74,3 +74,4 @@ near call neutrino.testnet get_newest_events '{}' --account-id neutrino.testnet 
 near call neutrino.testnet get_interested_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet interest_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvGZo2wsGmRbZwGcU1t399\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_interested_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
+near call neutrino.testnet get_recent_event_created '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet

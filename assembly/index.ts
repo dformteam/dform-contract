@@ -48,6 +48,11 @@ export function init_new_event(
 ): string | null {
     return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date, url);
 }
+// TODO Check function loi khi dat vao view
+ 
+export function get_recent_event_created(): string | null {
+    return User.get_recent_event_created();
+}
 
 export function join_event(eventId: string): bool {
     return User.join_event(eventId);

@@ -32,6 +32,7 @@ class User {
     private events_owner: Set<string>;
     private forms_joined: Set<string>;
     private events_joined: Set<string>;
+    private recent_event_created: string;
 
     constructor() {
         this.id = Context.sender;
@@ -223,8 +224,14 @@ class User {
         const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
         newEvent.save();
         this.events_owner.add(newEvent.get_id());
+        let event_id: string = newEvent.get_id();
+        this.recent_event_created = event_id;
         this.save();
-        return newEvent.get_id();
+        return event_id;
+    }
+
+    get_recent_event_created(): string {
+        return this.recent_event_created;
     }
 
     join_event(eventId: string): bool {

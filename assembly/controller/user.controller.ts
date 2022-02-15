@@ -48,6 +48,16 @@ export function init_new_event(
     return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
 }
 
+export function get_recent_event_created(): string | null {
+    const sender = Context.sender;
+    let user = UserStorage.get(sender);
+    if (!user) {
+        return null;
+    }
+    return user.get_recent_event_created();
+
+}
+
 export function join_form(formId: string): bool {
     const sender = Context.sender;
 
