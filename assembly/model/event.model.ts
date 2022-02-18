@@ -238,7 +238,7 @@ class Event {
 
     leave_event(): bool {
         const sender = Context.sender;
-        const currentTimestamp = Context.blockTimestamp / 100000;
+        const currentTimestamp = Context.blockTimestamp / 1000000;
         if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.register_end_date) {
             if (this.participants.has(sender)) {
                 //TODO: need to refund
