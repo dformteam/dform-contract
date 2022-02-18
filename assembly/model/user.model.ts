@@ -290,7 +290,7 @@ class User {
 
         existedEvent.leave_event();
         this.events_owner.delete(eventId);
-
+        this.events_joined.delete(eventId);
         this.save();
         UserEventStorage.delete(this.id, existedEvent.get_id());
         return true;
