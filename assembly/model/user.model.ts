@@ -293,7 +293,6 @@ class User {
 
         this.save();
         UserEventStorage.delete(this.id, existedEvent.get_id());
-        UserInterestedEventStorage.delete(this.id, existedEvent.get_id());
         return true;
     }
 
