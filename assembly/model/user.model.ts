@@ -1,6 +1,6 @@
 import { Context, u128, util, ContractPromiseBatch, logging } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
-import { EventStorage, UserEventStorage } from "../storage/event.storage";
+import { EventStorage, UserEventStorage, UserInterestedEventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
 import { ParticipantFormStorage } from "../storage/participant.storage";
 import { UserStorage } from "../storage/user.storage";
@@ -293,6 +293,7 @@ class User {
 
         this.save();
         UserEventStorage.delete(this.id, existedEvent.get_id());
+        UserInterestedEventStorage.delete(this.id, existedEvent.get_id());
         return true;
     }
 
