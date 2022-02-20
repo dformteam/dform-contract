@@ -1,8 +1,9 @@
-import { Context, logging } from "near-sdk-as";
+import { Context, logging, u128 } from "near-sdk-as";
 import { EVENT_TYPE } from "../model/event.model";
 import { FORM_TYPE } from "../model/form.model";
 import UserDetailResponse from "../model/response/user_detail_response";
 import User from "../model/user.model";
+import { USER_STATUS } from "../model/user.model";
 import { UserStorage } from "../storage/user.storage";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
@@ -111,9 +112,9 @@ export function leave_event(eventId: string): bool {
 }
 
 export function get_user(userId: string): UserDetailResponse | null {
-    const user = UserStorage.get(userId);
+    let user = UserStorage.get(userId);
     if (user == null) {
-        return null;
+        return new UserDetailResponse(userId, USER_STATUS.ACTIVE, u128.Zero, u128.Zero, 0, 0, 0, 0);
     }
 
     return new UserDetailResponse(
