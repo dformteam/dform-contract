@@ -3,7 +3,7 @@ import { PaginationResult } from "../helper/pagination.helper";
 import { EVENT_TYPE } from "../model/event.model";
 import Event from "../model/event.model";
 import EventDetailResponse from "../model/response/event_detail_response";
-import { EventStorage } from "../storage/event.storage";
+import { EventStorage, NewestEventStorage, UserEventStorage, UserInterestedEventStorage } from "../storage/event.storage";
 
 export function get_event(eventId: string): EventDetailResponse | null {
     const event = EventStorage.get(eventId);
@@ -27,8 +27,14 @@ export function get_event(eventId: string): EventDetailResponse | null {
         event.get_type(),
         event.get_register_start_date(),
         event.get_register_end_date(),
+        event.get_public_url(),
     );
 }
+
+export function get_events(userId: string, page: i32): PaginationResult<Event> {
+    return UserEventStorage.gets(userId, page);
+}
+
 
 export function update_event_info(
     eventId: string,
@@ -39,6 +45,7 @@ export function update_event_info(
     start_date: u64,
     end_date: u64,
     type: EVENT_TYPE,
+    url: string
 ): Event | null {
     const event = EventStorage.get(eventId);
     if (event == null) {
@@ -53,6 +60,7 @@ export function update_event_info(
         .set_start_date(start_date)
         .set_end_date(end_date)
         .set_type(type)
+        .set_public_url(url)
         .save();
 
     return event;
@@ -65,6 +73,14 @@ export function get_enroll_fee(eventId: string): u128 | null {
     }
 
     return event.get_enroll_fee();
+}
+
+export function get_event_count(userId: string): i32 {
+    return UserEventStorage.count(userId);
+}
+
+export function get_interested_event_count(userId: string): i32 {
+    return UserInterestedEventStorage.count(userId);
 }
 
 export function get_participants(eventId: string, page: i32): PaginationResult<string> {
@@ -105,23 +121,36 @@ export function delete_event(id: string): bool {
     return true;
 }
 
-export function interest_event(eventId: string): bool {
+export function interest_event(eventId: string): string | null {
     const event = EventStorage.get(eventId);
+    const sender = Context.sender;
     if (event == null) {
-        return false;
+        return null;
     }
-    return event.interest();
+    if (event.interest()) {
+        UserInterestedEventStorage.set(sender, eventId);
+        return 'Interested';
+    } else if (event.not_interest()) {
+        UserInterestedEventStorage.delete(sender, eventId);
+        return 'Disinterested'
+    } else {
+        return null;
+    }
 }
 
-export function not_interest_event(eventId: string): bool {
-    const event = EventStorage.get(eventId);
-
-    if (event == null) {
-        return false;
-    }
-
-    return event.not_interest();
+export function get_interested_events(userId: string, page: i32): PaginationResult<Event> {
+    return UserInterestedEventStorage.gets(userId, page);
 }
+
+// export function not_interest_event(eventId: string): bool {
+//     const event = EventStorage.get(eventId);
+
+//     if (event == null) {
+//         return false;
+//     }
+
+//     return event.not_interest();
+// }
 
 export function publish_event(
     eventId: string,
@@ -147,4 +176,8 @@ export function unpublish_event(eventId: string): bool {
     }
 
     return existedEvent.unpublish();
+}
+
+export function get_newest_events(): PaginationResult<Event> {
+    return NewestEventStorage.gets();
 }

@@ -32,6 +32,7 @@ export function init_new_event(
     event_type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
+    url: string
 ): string | null {
     if (name == "") {
         return null;
@@ -45,7 +46,17 @@ export function init_new_event(
         user.save();
     }
 
-    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
+    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
+}
+
+export function get_recent_event_created(): string | null {
+    const sender = Context.sender;
+    let user = UserStorage.get(sender);
+    if (!user) {
+        return null;
+    }
+    return user.get_recent_event_created();
+
 }
 
 export function join_form(formId: string): bool {

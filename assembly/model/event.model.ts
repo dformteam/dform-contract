@@ -1,7 +1,7 @@
 import { base58, Context, ContractPromiseBatch, logging, u128, util } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
 import { BlackListStorage } from "../storage/black_list.storage";
-import { EventStorage } from "../storage/event.storage";
+import { EventStorage, NewestEventStorage, UserEventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
 import { UserStorage } from "../storage/user.storage";
 import { WhiteListStorage } from "../storage/white_list.storage";
@@ -47,6 +47,7 @@ class Event {
         private event_type: EVENT_TYPE,
         private start_date: u64,
         private end_date: u64,
+        private url: string
     ) {
         this.created_at = Context.blockTimestamp / 1000000;
         this.owner = Context.sender;
@@ -95,6 +96,15 @@ class Event {
         return this;
     }
 
+    set_public_url(value: string): Event {
+        if (value !== "" && this.url !== value) {
+            this.url = value;
+        }
+
+        return this;
+    }
+
+
     set_start_date(value: u64): Event {
         if (this.start_date !== value) {
             this.start_date = value;
@@ -140,6 +150,7 @@ class Event {
             this.status = EVENT_STATUS.STARTING;
             BlackListStorage.sets(this.id, black_list);
             WhiteListStorage.sets(this.id, white_list);
+            NewestEventStorage.push(this.id);
             this.save();
             return true;
         }
@@ -173,9 +184,8 @@ class Event {
     }
 
     public toString(): string {
-        return `{id: ${this.id}, owner: ${this.owner}, description: ${
-            this.description
-        }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
+        return `{id: ${this.id}, owner: ${this.owner}, description: ${this.description
+            }, participants: ${this.participants.values()}, interests: ${this.interests.values()} }`;
     }
 
     get_id(): string {
@@ -228,7 +238,7 @@ class Event {
 
     leave_event(): bool {
         const sender = Context.sender;
-        const currentTimestamp = Context.blockTimestamp / 100000;
+        const currentTimestamp = Context.blockTimestamp / 1000000;
         if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.register_end_date) {
             if (this.participants.has(sender)) {
                 //TODO: need to refund
@@ -254,6 +264,10 @@ class Event {
 
     get_cover_image(): string {
         return this.cover_image;
+    }
+
+    get_public_url(): string {
+        return this.url;
     }
 
     get_number_of_participants(): i32 {
@@ -332,10 +346,12 @@ class Event {
             // Need to refund to participant
         }
         EventStorage.delete(this.id);
+        UserEventStorage.delete(this.owner, this.id);
     }
 
     save(): void {
         EventStorage.set(this.id, this);
+        UserEventStorage.set(this.owner, this.id);
     }
 }
 
