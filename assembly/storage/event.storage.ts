@@ -147,7 +147,7 @@ export class NewestEventStorage {
             newestEventPersit.pop();
         }
         temp_list.unshift(eventId);
-        while (temp_list.length > 5) {
+        while (temp_list.length > 20) {
             temp_list.pop();
         }
         for (let i = 0; i < temp_list.length; i++) {
