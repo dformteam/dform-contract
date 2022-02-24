@@ -1,7 +1,6 @@
-import { base58, Context, u128, util, ContractPromiseBatch, logging } from "near-sdk-core";
-import { FormStorage, OwnerStorage, UserFormStorage } from "../storage/form.storage";
+import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
+import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
-import PassedElement from "./passed_element";
 import Participant from "./participant.model";
 import Element from "./element.model";
 import ParticipantForm from "./participant_form.model";
@@ -43,16 +42,13 @@ class Form {
     private isRetry: bool = false;
     private nonce: i32 = 0;
     private isClaimed: bool = false;
+    private rootId: string;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
         this.created_at = Context.blockTimestamp / 1000000;
         this.status = FORM_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
-
-        let owner_total_form = OwnerStorage.get(this.owner);
-        OwnerStorage.set(this.owner, owner_total_form + 1);
-
 
         if (this.elements == null) {
             this.elements = new Set<string>();
@@ -148,7 +144,7 @@ class Form {
     }
 
     claim(): u128 {
-        if ((Context.blockTimestamp / 1000000) <= this.end_date || this.isClaimed) return u128.Zero;
+        if (Context.blockTimestamp / 1000000 <= this.end_date || this.isClaimed) return u128.Zero;
         let claimedAmount: u128 = u128.Zero;
         for (let i = 0; i < this.participants.size; i++) {
             // TODO: Specific storage fee after merge fee feature
@@ -312,6 +308,7 @@ class Form {
             this.start_date = 0;
             this.end_date = 0;
             this.limit_participants = 0;
+            this.isRetry = false;
             BlackListStorage.deletes(this.id);
             WhiteListStorage.deletes(this.id);
             const participants = this.participants.values();
@@ -372,8 +369,7 @@ class Form {
         return false;
     }
 
-    submit_answer(userId: string, elementId: string, answers: Set<string>): bool {
-        //need to join form first to create the necessary storage
+    submit_answer(userId: string, rootId: string): bool {
         if (!this.participants.has(userId)) {
             return false;
         }
@@ -391,31 +387,27 @@ class Form {
             return false;
         }
 
-        const passed_element_existed = participant_form.contain_passed_element(elementId);
-
-        if (this.isRetry || !passed_element_existed) {
-            const newPassedElement = new PassedElement(elementId, answers);
-            newPassedElement.save();
-
-            participant_form.set_passed_element(elementId);
-            participant_form.save();
+        if (this.isRetry || participant_form.get_submit_times() == 0) {
+            this.rootId = rootId;
+            participant_form.inc_submit_times().save();
+            this.save();
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     toString(): string {
         return `{id: ${this.id}, owner: ${this.owner}, element: ${this.elements.values()}}`;
     }
 
-    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>): bool {
+    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>, isRetry: bool): bool {
         if (this.status == FORM_STATUS.EDITING) {
             this.start_date = start_date;
             this.limit_participants = limit_participants;
             this.end_date = end_date;
             this.enroll_fee = enroll_fee;
             this.status = FORM_STATUS.STARTING;
+            this.isRetry = isRetry;
             BlackListStorage.sets(this.id, black_list);
             WhiteListStorage.sets(this.id, white_list);
             this.save();

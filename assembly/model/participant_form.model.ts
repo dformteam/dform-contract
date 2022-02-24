@@ -37,7 +37,7 @@ class ParticipantForm {
         return this.passed_element.values();
     }
 
-    get_passed_element_count(): i32{
+    get_passed_element_count(): i32 {
         return this.passed_element.size;
     }
 
@@ -45,12 +45,21 @@ class ParticipantForm {
         return this.lastSubmitTimestamp;
     }
 
+    get_submit_times(): u32 {
+        return this.submitTimes;
+    }
+
+    inc_submit_times(): ParticipantForm {
+        this.submitTimes = this.submitTimes + 1;
+        return this;
+    }
+
     get_passed_question(): i32 {
         const elements = this.passed_element.values();
         let count = 0;
-        for (let i = 0; i< elements.length; i++){
+        for (let i = 0; i < elements.length; i++) {
             const element = ElementStorage.get(elements[i]);
-            if (element != null && element.get_type() != ElementType.HEADER){
+            if (element != null && element.get_type() != ElementType.HEADER) {
                 count = count + 1;
             }
         }
