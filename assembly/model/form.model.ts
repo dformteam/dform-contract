@@ -1,16 +1,16 @@
 import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
-import Participant from "./participant.model";
 import Element from "./element.model";
 import ParticipantForm from "./participant_form.model";
 import { ElementType } from "./element.model";
-import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
+import { ParticipantFormStorage } from "../storage/participant.storage";
 import { ElementStorage } from "../storage/element.storage";
 import { WhiteListStorage } from "../storage/white_list.storage";
 import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
+import { UserStorage } from "../storage/user.storage";
 
 export enum FORM_STATUS {
     EDITING,
@@ -34,11 +34,10 @@ class Form {
     private created_at: u64;
     private limit_participants: i32;
     private enroll_fee: u128;
-    private start_date: u64;
-    private end_date: u64;
+    public start_date: u64;
+    public end_date: u64;
     private elements: Set<string>;
     private participants: Set<string>;
-    // private participantsClaimed: Set<string>;
     private isRetry: bool = false;
     private nonce: i32 = 0;
     private isClaimed: bool = false;
@@ -176,6 +175,10 @@ class Form {
         }
     }
 
+    get_description(): string {
+        return this.description;
+    }
+
     set_retry(value: bool): void {
         if (this.isRetry != value) {
             this.isRetry = value;
@@ -239,36 +242,16 @@ class Form {
         }
     }
 
-    // set_element_title(element_id: string, new_title: string[]): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_title(new_title);
-    // }
-
-    // set_element_meta(element_id: string, new_meta: Set<string>): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_meta(new_meta);
-    // }
-
-    // set_element_required(element_id: string, new_required: bool): void {
-    //     const element = ElementStorage.get(element_id);
-    //     if (element == null) {
-    //         return;
-    //     }
-    //     element.set_required(new_required);
-    // }
-
     save(): void {
         FormStorage.set(this.id, this);
         UserFormStorage.set(this.owner, this.id);
     }
 
     remove(): void {
+        const currentTimestamp = Context.blockTimestamp / 100000;
+        if (this.status === FORM_STATUS.STARTING && currentTimestamp < this.end_date) {
+            //need to refund for participant
+        }
         FormStorage.delete(this.id);
         UserFormStorage.delete(this.owner, this.id);
     }
@@ -281,6 +264,8 @@ class Form {
             newElement.save();
             this.elements.add(newElement.get_id());
             this.save();
+            // this.componentStorageFee = u128.add(this.componentStorageFee, newElement.get_storage_fee());
+            // TODO: Them co che cho phep owner nap them tien vao de duy tri dich vu
             return newElement;
         }
         return null;
@@ -314,13 +299,12 @@ class Form {
             const participants = this.participants.values();
             const participant_length = participants.length;
             for (let i = 0; i < participant_length; i++) {
-                const participant = ParticipantStorage.get(participants[i]);
+                const participant = UserStorage.get(participants[i]);
                 if (participant != null) {
-                    let promise = ContractPromiseBatch.create(participants[i]);
+                    ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
                     // if(!promise) return false;
                     // TODO Handle list error
-                    promise.transfer(this.enroll_fee);
-                    participant.remove_form(this.id);
+                    participant.remove_form_joined(this.id);
                 }
             }
             this.enroll_fee = u128.Zero;
@@ -348,16 +332,6 @@ class Form {
             }
 
             this.participants.add(sender);
-
-            let participant = ParticipantStorage.get(sender);
-
-            if (participant == null) {
-                participant = new Participant();
-            }
-
-            participant.join_form(this.id);
-
-            participant.save();
 
             const participant_form = new ParticipantForm(this.id);
             participant_form.save();
@@ -484,7 +458,9 @@ class Form {
         return ElementStorage.get(element_id);
     }
 
-    // publicAsATemplate(): void {}
+    get_current_num_participants(): i32 {
+        return this.participants.size;
+    }
 }
 
 export default Form;

@@ -13,3 +13,5 @@ yarn.lock
 
 out/
 *.wasm
+
+out/main.wasm

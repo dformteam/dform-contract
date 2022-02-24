@@ -5,9 +5,10 @@ import { FormStorage } from "../storage/form.storage";
 import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
 import { ParticipantFormResponse } from "../model/response/participant_form";
 import { ParticipantFormStatusResponse } from "../model/response/participant_form_status";
+import { UserStorage } from "../storage/user.storage";
 
 export function get_joined_forms(userId: string, page: i32): PaginationResult<ParticipantFormResponse> {
-    const participant = ParticipantStorage.get(userId);
+    const participant = UserStorage.get(userId);
 
     if (participant == null) {
         return new PaginationResult(1, 0, new Array<ParticipantFormResponse>(0));
@@ -17,7 +18,7 @@ export function get_joined_forms(userId: string, page: i32): PaginationResult<Pa
 }
 
 export function get_joined_forms_count(userId: string): i32 {
-    const participant = ParticipantStorage.get(userId);
+    const participant = UserStorage.get(userId);
 
     if (participant == null) {
         return 0;
@@ -37,7 +38,7 @@ export function get_answer_statistical(userId: string, formId: string, page: i32
 }
 
 export function get_participant_form_status(userId: string, formId: string): ParticipantFormStatusResponse {
-    const participant = ParticipantStorage.get(userId);
+    const participant = UserStorage.get(userId);
     if (participant == null) {
         return new ParticipantFormStatusResponse(userId, formId, false);
     }
@@ -55,5 +56,5 @@ export function get_passed_element_count(userId: string, formId: string): i32 {
 }
 
 export function get_participants_count(): i32 {
-    return ParticipantStorage.count();
+    return UserStorage.count();
 }

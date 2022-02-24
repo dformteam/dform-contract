@@ -1,5 +1,6 @@
 import { Context } from "near-sdk-core";
 import { PassedElementStorage } from "../storage/passed_element";
+import Base from "./base.model";
 import { ElementType } from "./element.model";
 
 @nearBindgen
@@ -17,11 +18,12 @@ export class UserAnswer {
 }
 
 @nearBindgen
-class PassedElement {
+class PassedElement extends Base {
     private id: string;
     private owner: string;
     private submit_time: u64;
     constructor(private elementId: string, private content: Set<string>) {
+        super();
         this.owner = Context.sender;
         this.submit_time = Context.blockTimestamp;
         this.generate_answer_id();
@@ -48,6 +50,7 @@ class PassedElement {
     }
 
     save(): void {
+        this.cal_storage_fee(this.id, this.toString());
         PassedElementStorage.set(this.id, this);
     }
 }

@@ -1,26 +1,27 @@
-near call xtest3.testnet init_new_form '{"title": "test_dep", "description":"formtest", "type": 0}' --account-id xtest3.testnet --gas=300000000000000
-near view xtest3.testnet get_form '{"id": "BKNttCuSxPEocPiRAfZGd21nrHitePhFG4VH5bBs37qZaZgs"}' --account-id xtest3.testnet
-near view xtest3.testnet get_forms_count '{}' --account-id xtest3.testnet
-near view xtest3.testnet get_participants_count '{}' --account-id xtest3.testnet
-near call xtest3.testnet new_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "type": 2, "title": ["q_test2222332254_ggg33_vvbbv"], "meta": ["123123", "3123123"], "isRequired": false}' --account-id xtest3.testnet --gas=300000000000000
-near view xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest3.testnet"}' --account-id xtest3.testnet
-near call neutrino.testnet publish_form '{"formId": "BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn", "limit_participants": 200, "enroll_fee": "0", "start_date": "1612112400000", "end_date": "1675184400000", "black_list": [], "white_list": []}' --account-id neutrino.testnet
-near call xtest3.testnet unpublish_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K"}' --account-id xtest3.testnet
-near view xtest3.testnet get_element_count '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f"}' --account-id xtest3.testnet
+near call xtest1.testnet init_new_form '{"title": "test_dep", "description":"formtest", "type": 0}' --account-id xtest1.testnet --gas=300000000000000
+near view xtest1.testnet get_user '{"userId": "xtest1.testnet"}' --account-id xtest1.testnet
+near view xtest1.testnet get_form '{"id": "cnPNVXsrQbdiCtvpZZrRvimgNzeJXK7tbZyJ2xUsYLpUN"}' --account-id xtest3.testnet
+near view xtest1.testnet get_forms_count '{}' --account-id xtest1.testnet
+near view xtest1.testnet get_participants_count '{}' --account-id xtest1.testnet
+near call xtest1.testnet new_element '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNzefr2uYi4imJUUaFKoYe", "type": 2, "title": ["q_test2222332254_ggg33_vvbbv"], "meta": ["123123", "3123123"], "isRequired": false, "numth": 0}' --account-id xtest1.testnet --gas=300000000000000
+near view xtest1.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest1.testnet"}' --account-id xtest1.testnet
+near call xtest1.testnet publish_form '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNzefr2uYi4imJUUaFKoYe", "limit_participants": 200, "enroll_fee": "1000000000000000000000000", "start_date": "1612112400000", "end_date": "1675184400000", "black_list": [], "white_list": []}' --account-id xtest1.testnet
+near call xtest1.testnet unpublish_form '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNzefr2uYi4imJUUaFKoYe"}' --account-id xtest1.testnet
+near view xtest1.testnet get_element_count '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f"}' --account-id xtest1.testnet
 
-near call xtest3.testnet join_form '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu"}' --account-id xtest3.testnet
-near call xtest3.testnet submit_answer '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "elementId": "8ArNoKHTUmLJCz7j6mhZqcSmkAE7WXALtnQPLtkLJUa29SPhX9PdrK2ssutouTELD3adyWg859gpgx9uwEUTS", "answer": ["123123"]}' --account-id xtest3.testnet --gas=300000000000000
-near call xtest3.testnet get_answer_statistical '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "anhhd.testnet", "page": 2}' --account-id xtest1.testnet --gas=300000000000000
-near view xtest3.testnet get_passed_element_count '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "gefi_hub.testnet", "page": 2}' --account-id xtest1.testnet
+near call xtest1.testnet join_form '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNzefr2uYi4imJUUaFKoYe"}' --account-id xtest3.testnet --deposit 1
+near call xtest1.testnet submit_answer '{"formId": "cnPNVXssboBwGRcdzKSNtD6t6EfXSQmonVhfL38rhtCHu", "elementId": "8ArNoKHTUmLJCz7j6mhZqcSmkAE7WXALtnQPLtkLJUa29SPhX9PdrK2ssutouTELD3adyWg859gpgx9uwEUTS", "answer": ["123123"]}' --account-id xtest1.testnet --gas=300000000000000
+near call xtest1.testnet get_answer_statistical '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "anhhd.testnet", "page": 2}' --account-id xtest1.testnet --gas=300000000000000
+near view xtest1.testnet get_passed_element_count '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNt7GVbm2kX3HPgsY2E42N", "userId": "gefi_hub.testnet", "page": 2}' --account-id xtest1.testnet
 
-near view xtest3.testnet get_forms '{"userId": "gefi_hub.testnet", "page": 1}' --account-id xtest3.testnet
-near view xtest3.testnet get_joined_forms '{"userId": "xtest3.testnet", "page": 1}' --account-id xtest3.testnet
-near view xtest3.testnet test '{"title": ["123", "123123", "345345"]}' --account-id xtest3.testnet
-near view xtest3.testnet get_elements '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f", "userId": "xtest3.testnet", "page": 2}' --account-id xtest3.testnet
+near view xtest1.testnet get_forms '{"userId": "gefi_hub.testnet", "page": 1}' --account-id xtest1.testnet
+near view xtest1.testnet get_joined_forms '{"userId": "xtest1.testnet", "page": 1}' --account-id xtest1.testnet
+near view xtest1.testnet test '{"title": ["123", "123123", "345345"]}' --account-id xtest1.testnet
+near view xtest1.testnet get_elements '{"formId": "WqjNngckQsLxBDFejuZp4RqZMaWq14VETthR5ovfB6m3f", "userId": "xtest1.testnet", "page": 2}' --account-id xtest1.testnet
 
-near view xtest3.testnet get_participant_form_status '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest3.testnet"}' --account-id xtest3.testnet
+near view xtest1.testnet get_participant_form_status '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "userId": "xtest1.testnet"}' --account-id xtest1.testnet
 
-near call xtest3.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "index": 1}' --account-id xtest3.testnet --gas=300000000000000
+near call xtest1.testnet get_element '{"formId": "cnPNVXssboBwGRcdzKSNtD6t68DGwU2uRqrL19AtHaN5K", "index": 1}' --account-id xtest1.testnet --gas=300000000000000
 
 near view mtoan2111.testnet get_form_count '{"userId": "mtoan2111.testnet"}' --account-id mtoan2111.testnet
 
@@ -48,3 +49,22 @@ near call neutrino.testnet set_enroll_fee '{\"formId\": \"BKNttCuSxPEocPiRAfZGd2
 near view neutrino.testnet get_participants '{"formId": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet claim_reward '{\"formId\": \"BKNttCuSxPEocPiRAfZGd21nrHithdvRUjV5ba2MefG7CuZn\"}' --account-id neutrino.testnet
 
+
+# event
+
+near call xtest1.testnet init_new_event '{"name": "test_dep", "description":["formtest"], "location": "Hanoi", "privacy": [""], "cover_image": "", "type": 0}' --account-id xtest1.testnet --gas=300000000000000 --deposit 1
+near view xtest1.testnet get_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest1.testnet
+near call xtest1.testnet publish_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi", "limit_participants": 200, "enroll_fee": "1000000000000000000000000", "start_date": "1612112400000", "end_date": "1675184400000", "black_list": [], "white_list": []}' --account-id xtest1.testnet
+near call xtest1.testnet join_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest3.testnet --deposit 1
+near view xtest1.testnet get_user '{"userId": "xtest3.testnet"}' --account-id xtest1.testnet
+near call xtest1.testnet unpublish_event '{"eventId": "nMX4ZeyxLTK9ZYyJmA9FhR7Y8zgieLsvfVzTUyDKhVLk51LatoExi"}' --account-id xtest1.testnet
+
+
+near call xtest1.testnet init_new_event '{\"title\": \"test_dep\", \"location\": \"Hanoi\", \"description\":[\"formtest\"], \"privacy\": [\"\"], \"cover_image\": \"\", \"type\": 0, \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\"}' --account-id neutrino.testnet --gas=300000000000000 --deposit 1
+near call xtest1.testnet get_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvDGccKD5zmAPoskS2WhtB\"}' --account-id neutrino.testnet
+near call neutrino.testnet publish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\", \"limit_participants\": 200, \"enroll_fee\": \"1000000000000000000000000\", \"start_date\": \"1612112400000\", \"end_date\": \"1675184400000\", \"black_list\": [], \"white_list\": []}' --account-id neutrino.testnet
+near call neutrino.testnet join_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\"}' --account-id neutrino.testnet --deposit 1
+near call neutrino.testnet get_user '{\"userId\": \"gefi_hub.testnet\"}' --account-id neutrino.testnet
+near call neutrino.testnet unpublish_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLoC2WBSenwrB3ksDBc95Nq\"}' --account-id neutrino.testnet
+near call neutrino.testnet get_owned_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
+near call neutrino.testnet get_particippated_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet

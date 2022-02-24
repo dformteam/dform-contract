@@ -1,7 +1,5 @@
 import { Context, u128 } from "near-sdk-as";
-import { ElementStorage } from "../storage/element.storage";
 import { ParticipantFormStorage } from "../storage/participant.storage";
-import { ElementType } from "./element.model";
 
 @nearBindgen
 class ParticipantForm {
@@ -55,20 +53,15 @@ class ParticipantForm {
     }
 
     get_passed_question(): i32 {
-        const elements = this.passed_element.values();
-        let count = 0;
-        for (let i = 0; i < elements.length; i++) {
-            const element = ElementStorage.get(elements[i]);
-            if (element != null && element.get_type() != ElementType.HEADER) {
-                count = count + 1;
-            }
-        }
-
-        return count;
+        return this.passed_element.size;
     }
 
     contain_passed_element(id: string): bool {
         return this.passed_element.has(id);
+    }
+
+    toString(): string {
+        return `{id: ${this.id}, lastSubmitTimestamp: ${this.lastSubmitTimestamp}, cashSpent: ${this.cashSpent}, submitTimes: ${this.submitTimes}, passed_element: ${this.passed_element}}`;
     }
 
     save(): void {
