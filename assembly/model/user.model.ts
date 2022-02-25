@@ -134,16 +134,6 @@ class User {
     }
 
     create_form(title: string, description: string, type: FORM_TYPE): string | null {
-        const created_forms = this.forms_owner.size;
-
-        if (created_forms >= 3) {
-            const deposited = Context.attachedDeposit;
-            if (!this.isHalfNear(deposited)) {
-                return null;
-            }
-            this.outcome = u128.sub(this.outcome, deposited);
-        }
-
         const new_form = new Form(title, description, type);
         new_form.save();
         this.forms_owner.add(new_form.get_id());
@@ -206,7 +196,7 @@ class User {
         event_type: EVENT_TYPE,
         start_date: u64,
         end_date: u64,
-        url: string
+        url: string,
     ): string | null {
         const deposit = Context.attachedDeposit;
         const sender = Context.sender;
