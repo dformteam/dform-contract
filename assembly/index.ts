@@ -123,8 +123,8 @@ export function get_form_status(formId: string): FormStatusResponse {
     return Form.get_form_status(formId);
 }
 
-export function submit_answer(formId: string, rootId: string): bool {
-    return Answer.submit_answer(formId, rootId);
+export function submit_answer(formId: string, rootId: string, lastRootId: string): bool {
+    return Answer.submit_answer(formId, rootId, lastRootId);
 }
 
 export function update_element(formId: string, id: string, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
@@ -144,7 +144,6 @@ export function get_participant_form_status(userId: string, formId: string): Par
 }
 
 export function test(title: Set<string>): void {
-    logging.log(title.values());
 }
 
 export function get_event(eventId: string): EventDetailResponse | null {

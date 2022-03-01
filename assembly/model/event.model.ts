@@ -233,7 +233,6 @@ class Event {
             if (this.participants.has(sender)) {
                 //TODO: need to refund
                 const refund_amount = u128.div(u128.mul(this.enroll_fee, u128.from("90")), u128.from("100"));
-                logging.log(refund_amount);
                 ContractPromiseBatch.create(sender).transfer(refund_amount);
                 this.participants.delete(sender);
                 this.save();

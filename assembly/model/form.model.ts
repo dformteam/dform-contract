@@ -42,6 +42,7 @@ class Form {
     private nonce: i32 = 0;
     private isClaimed: bool = false;
     private rootId: string;
+    private ans_nonce: i32 = 0;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
@@ -343,7 +344,7 @@ class Form {
         return false;
     }
 
-    submit_answer(userId: string, rootId: string): bool {
+    submit_answer(userId: string, rootId: string, lastRootId: string): bool {
         if (!this.participants.has(userId)) {
             return false;
         }
@@ -361,8 +362,13 @@ class Form {
             return false;
         }
 
+        if (this.rootId != null && lastRootId != this.rootId) {
+            return false;
+        }
+
         if (this.isRetry || participant_form.get_submit_times() == 0) {
             this.rootId = rootId;
+            this.ans_nonce += 1;
             participant_form.inc_submit_times().save();
             this.save();
             return true;
