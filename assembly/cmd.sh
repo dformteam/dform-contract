@@ -76,3 +76,4 @@ near call neutrino.testnet interest_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsT
 near call neutrino.testnet get_interested_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_recent_event_created '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
 near call neutrino.testnet leave_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49o2ZLMEAsEs3xUsZKu115H3\"}' --account-id gefi_match.testnet
+near call neutrino.testnet check_event_join_permission '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49oGf9xhdPE615LdKLfKzTgr\"}' --account-id neutrino.testnet

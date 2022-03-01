@@ -1,9 +1,11 @@
-import { Context, u128 } from "near-sdk-core";
+import { Context, u128, logging } from "near-sdk-core";
 import { PaginationResult } from "../helper/pagination.helper";
 import { EVENT_TYPE } from "../model/event.model";
 import Event from "../model/event.model";
 import EventDetailResponse from "../model/response/event_detail_response";
 import { EventStorage, NewestEventStorage, UserEventStorage, UserInterestedEventStorage } from "../storage/event.storage";
+import { BlackListStorage } from "../storage/black_list.storage";
+import { WhiteListStorage } from "../storage/white_list.storage";
 
 export function get_event(eventId: string): EventDetailResponse | null {
     const event = EventStorage.get(eventId);
@@ -29,6 +31,23 @@ export function get_event(eventId: string): EventDetailResponse | null {
         event.get_register_end_date(),
         event.get_public_url(),
     );
+}
+
+export function check_event_join_permission(eventId: string): bool {
+    const sender = Context.sender;
+    const existedEvent = EventStorage.get(eventId);
+
+    if (existedEvent == null || existedEvent.get_owner() === sender) {
+        return false;
+    }
+    if (BlackListStorage.contains(eventId, sender)) {
+        return false;
+    }
+    if (WhiteListStorage.get(eventId) != [] && !WhiteListStorage.contains(eventId, sender)) {
+        return false;
+    }
+
+    return true;
 }
 
 export function get_events(userId: string, page: i32): PaginationResult<Event> {

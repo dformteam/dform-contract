@@ -49,7 +49,7 @@ export function init_new_event(
     return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date, url);
 }
 // TODO Check function loi khi dat vao view
- 
+
 export function get_recent_event_created(): string | null {
     return User.get_recent_event_created();
 }
@@ -162,6 +162,10 @@ export function get_events(userId: string, page: i32): PaginationResult<EventMod
 
 export function get_newest_events(): PaginationResult<EventModel> {
     return Event.get_newest_events();
+}
+
+export function check_event_join_permission(eventId: string): bool {
+    return Event.check_event_join_permission(eventId);
 }
 
 export function get_event_count(userId: string): i32 {
