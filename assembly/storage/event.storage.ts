@@ -156,6 +156,23 @@ export class NewestEventStorage {
         return temp_list;
     }
 
+    static delete(eventId: string): void {
+        let temp_list: string[] = [];
+        for (let i = 0; i < newestEventPersit.length; i++) {
+            temp_list.push(newestEventPersit[i]);
+        }
+        if (!temp_list.includes(eventId)) {
+            return;
+        }
+        let idx = temp_list.indexOf(eventId);
+        temp_list.splice(idx, 1);
+        while (newestEventPersit.length > 0) {
+            newestEventPersit.pop();
+        }
+        for (let i = 0; i < temp_list.length; i++) {
+            newestEventPersit.push(temp_list[i]);
+        }
+    }
 }
 
 export class UserInterestedEventStorage {

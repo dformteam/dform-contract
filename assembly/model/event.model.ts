@@ -177,6 +177,7 @@ class Event {
             }
             this.enroll_fee = u128.Zero;
             this.participants.clear();
+            NewestEventStorage.delete(this.id);
             this.save();
             return true;
         }
