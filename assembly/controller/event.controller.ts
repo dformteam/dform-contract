@@ -30,6 +30,7 @@ export function get_event(eventId: string): EventDetailResponse | null {
         event.get_register_start_date(),
         event.get_register_end_date(),
         event.get_public_url(),
+        event.get_publish_status(),
     );
 }
 
@@ -160,16 +161,6 @@ export function interest_event(eventId: string): string | null {
 export function get_interested_events(userId: string, page: i32): PaginationResult<Event> {
     return UserInterestedEventStorage.gets(userId, page);
 }
-
-// export function not_interest_event(eventId: string): bool {
-//     const event = EventStorage.get(eventId);
-
-//     if (event == null) {
-//         return false;
-//     }
-
-//     return event.not_interest();
-// }
 
 export function publish_event(
     eventId: string,

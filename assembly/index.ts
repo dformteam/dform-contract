@@ -222,10 +222,6 @@ export function interest_event(eventId: string): string | null {
     return Event.interest_event(eventId);
 }
 
-// export function not_interest_event(eventId: string): bool {
-//     return Event.not_interest_event(eventId);
-// }
-
 export function get_interested_events(userId: string, page: i32): PaginationResult<EventModel> {
     return Event.get_interested_events(userId, page);
 }
