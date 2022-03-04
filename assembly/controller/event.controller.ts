@@ -197,6 +197,10 @@ export function unpublish_event(eventId: string): bool {
     return existedEvent.unpublish();
 }
 
-export function get_newest_events(): PaginationResult<Event> {
-    return NewestEventStorage.gets();
+export function get_newest_events(page: i32): PaginationResult<Event> {
+    return NewestEventStorage.gets(page);
+}
+
+export function get_newest_events_count(): i32 {
+    return NewestEventStorage.count();
 }

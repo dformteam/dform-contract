@@ -160,8 +160,12 @@ export function get_events(userId: string, page: i32): PaginationResult<EventMod
     return Event.get_events(userId, page);
 }
 
-export function get_newest_events(): PaginationResult<EventModel> {
-    return Event.get_newest_events();
+export function get_newest_events(page: i32): PaginationResult<EventModel> {
+    return Event.get_newest_events(page);
+}
+
+export function get_newest_events_count(): i32 {
+    return Event.get_newest_events_count();
 }
 
 export function check_event_join_permission(eventId: string): bool {

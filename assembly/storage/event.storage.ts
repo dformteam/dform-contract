@@ -122,17 +122,23 @@ export class NewestEventStorage {
         return null;
     }
 
-    static gets(): PaginationResult<Event> {
+    static gets(page: i32): PaginationResult<Event> {
         const eventSize = newestEventPersit.length;
+
+        const pagination_offset = getPaginationOffset(eventSize, page);
         const ret: Set<Event> = new Set<Event>();
 
-        for (let i = 0; i < eventSize; i++) {
+        for (let i = pagination_offset.startIndex; i >= pagination_offset.endIndex; i--) {
             if (eventPersit.contains(newestEventPersit[i])) {
                 const eventDetails = eventPersit.getSome(newestEventPersit[i]);
                 ret.add(eventDetails);
             }
         }
-        return new PaginationResult<Event>(0, eventSize, ret.values());
+        return new PaginationResult<Event>(page, eventSize, ret.values());
+    }
+
+    static count(): i32 {
+        return newestEventPersit.length;
     }
 
     static push(eventId: string): string[] | null {

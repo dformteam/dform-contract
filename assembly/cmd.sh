@@ -70,7 +70,8 @@ near call neutrino.testnet get_owned_events '{\"userId\": \"neutrino.testnet\", 
 near call neutrino.testnet get_particippated_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet get_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
-near call neutrino.testnet get_newest_events '{}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_newest_events '{\"page\": 1}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_newest_events_count '{}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet get_interested_events '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet
 near call neutrino.testnet interest_event '{\"eventId\": \"GEZdGLxjz9z8ChsACivsTbYsEd6vyANQkkLvGZo2wsGmRbZwGcU1t399\"}' --account-id neutrino.testnet
 near call neutrino.testnet get_interested_event_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet
