@@ -1,8 +1,5 @@
 import { Context, u128 } from "near-sdk-as";
-import { ElementStorage } from "../storage/element.storage";
 import { ParticipantFormStorage } from "../storage/participant.storage";
-import Base from "./base.model";
-import { ElementType } from "./element.model";
 
 @nearBindgen
 class ParticipantForm {
@@ -44,6 +41,15 @@ class ParticipantForm {
 
     get_last_submited(): u64 {
         return this.lastSubmitTimestamp;
+    }
+
+    get_submit_times(): u32 {
+        return this.submitTimes;
+    }
+
+    inc_submit_times(): ParticipantForm {
+        this.submitTimes = this.submitTimes + 1;
+        return this;
     }
 
     get_passed_question(): i32 {

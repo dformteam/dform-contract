@@ -33,7 +33,6 @@ export class FormStorage {
         return formPersit.length;
     }
 }
-
 export class FormAnalysistStorage {
     static get(id: string): PersistentVector<string> | null {
         if (formAnalysis.contains(id)) {

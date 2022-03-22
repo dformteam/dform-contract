@@ -56,12 +56,13 @@ export function publish_form(
     end_date: u64,
     black_list: Set<string>,
     white_list: Set<string>,
+    isRetry: bool,
 ): bool {
     const existedForm = FormStorage.get(formId);
     if (existedForm == null) {
         return false;
     }
-    return existedForm.publish(limit_participants, enroll_fee, start_date, end_date, black_list, white_list);
+    return existedForm.publish(limit_participants, enroll_fee, start_date, end_date, black_list, white_list, isRetry);
 }
 
 export function unpublish_form(formId: string): bool {

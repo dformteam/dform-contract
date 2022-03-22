@@ -80,8 +80,9 @@ export function publish_form(
     end_date: u64,
     black_list: Set<string>,
     white_list: Set<string>,
+    isRetry: bool,
 ): bool {
-    return Form.publish_form(formId, limit_participants, enroll_fee, start_date, end_date, black_list, white_list);
+    return Form.publish_form(formId, limit_participants, enroll_fee, start_date, end_date, black_list, white_list, isRetry);
 }
 
 export function unpublish_form(formId: string): bool {
@@ -128,8 +129,8 @@ export function get_form_status(formId: string): FormStatusResponse {
     return Form.get_form_status(formId);
 }
 
-export function submit_answer(formId: string, elementId: string, answer: Set<string>): bool {
-    return Answer.submit_answer(formId, elementId, answer);
+export function submit_answer(formId: string, rootId: string, lastRootId: string): bool {
+    return Answer.submit_answer(formId, rootId, lastRootId);
 }
 
 export function update_element(formId: string, id: string, title: string[], meta: Set<string>, isRequired: bool): QuestionModel | null {
@@ -149,7 +150,6 @@ export function get_participant_form_status(userId: string, formId: string): Par
 }
 
 export function test(title: Set<string>): void {
-    logging.log(title.values());
 }
 
 export function get_event(eventId: string): EventDetailResponse | null {

@@ -1,17 +1,15 @@
 import { base58, Context, u128, util, ContractPromiseBatch } from "near-sdk-core";
 import { FormStorage, UserFormStorage } from "../storage/form.storage";
 import { UserAnswer } from "./passed_element";
-import PassedElement from "./passed_element";
 import Element from "./element.model";
 import ParticipantForm from "./participant_form.model";
 import { ElementType } from "./element.model";
-import { ParticipantFormStorage, ParticipantStorage } from "../storage/participant.storage";
+import { ParticipantFormStorage } from "../storage/participant.storage";
 import { ElementStorage } from "../storage/element.storage";
 import { WhiteListStorage } from "../storage/white_list.storage";
 import { BlackListStorage } from "../storage/black_list.storage";
 import { PassedElementStorage } from "../storage/passed_element";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
-import Base from "./base.model";
 import { UserStorage } from "../storage/user.storage";
 
 export enum FORM_STATUS {
@@ -43,6 +41,8 @@ class Form {
     private isRetry: bool = false;
     private nonce: i32 = 0;
     private isClaimed: bool = false;
+    private rootId: string;
+    private ans_nonce: i32 = 0;
 
     constructor(private title: string, private description: string, private type: FORM_TYPE) {
         this.owner = Context.sender;
@@ -294,6 +294,7 @@ class Form {
             this.start_date = 0;
             this.end_date = 0;
             this.limit_participants = 0;
+            this.isRetry = false;
             BlackListStorage.deletes(this.id);
             WhiteListStorage.deletes(this.id);
             const participants = this.participants.values();
@@ -343,8 +344,7 @@ class Form {
         return false;
     }
 
-    submit_answer(userId: string, elementId: string, answers: Set<string>): bool {
-        //need to join form first to create the necessary storage
+    submit_answer(userId: string, rootId: string, lastRootId: string): bool {
         if (!this.participants.has(userId)) {
             return false;
         }
@@ -362,31 +362,32 @@ class Form {
             return false;
         }
 
-        const passed_element_existed = participant_form.contain_passed_element(elementId);
-
-        if (this.isRetry || !passed_element_existed) {
-            const newPassedElement = new PassedElement(elementId, answers);
-            newPassedElement.save();
-
-            participant_form.set_passed_element(elementId);
-            participant_form.save();
-            return true;
-        } else {
+        if (this.rootId != null && lastRootId != this.rootId) {
             return false;
         }
+
+        if (this.isRetry || participant_form.get_submit_times() == 0) {
+            this.rootId = rootId;
+            this.ans_nonce += 1;
+            participant_form.inc_submit_times().save();
+            this.save();
+            return true;
+        }
+        return false;
     }
 
     toString(): string {
         return `{id: ${this.id}, owner: ${this.owner}, element: ${this.elements.values()}}`;
     }
 
-    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>): bool {
+    publish(limit_participants: i32, enroll_fee: u128, start_date: u64, end_date: u64, black_list: Set<string>, white_list: Set<string>, isRetry: bool): bool {
         if (this.status == FORM_STATUS.EDITING) {
             this.start_date = start_date;
             this.limit_participants = limit_participants;
             this.end_date = end_date;
             this.enroll_fee = enroll_fee;
             this.status = FORM_STATUS.STARTING;
+            this.isRetry = isRetry;
             BlackListStorage.sets(this.id, black_list);
             WhiteListStorage.sets(this.id, white_list);
             this.save();
