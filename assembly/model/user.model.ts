@@ -1,6 +1,6 @@
 import { Context, u128, util, ContractPromiseBatch, logging } from "near-sdk-as";
 import { getPaginationOffset, PaginationResult } from "../helper/pagination.helper";
-import { EventStorage } from "../storage/event.storage";
+import { EventStorage, UserEventStorage, UserInterestedEventStorage } from "../storage/event.storage";
 import { FormStorage } from "../storage/form.storage";
 import { ParticipantFormStorage } from "../storage/participant.storage";
 import { UserStorage } from "../storage/user.storage";
@@ -32,6 +32,7 @@ class User {
     private events_owner: Set<string>;
     private forms_joined: Set<string>;
     private events_joined: Set<string>;
+    private recent_event_created: string;
 
     constructor() {
         this.id = Context.sender;
@@ -133,16 +134,6 @@ class User {
     }
 
     create_form(title: string, description: string, type: FORM_TYPE): string | null {
-        const created_forms = this.forms_owner.size;
-
-        if (created_forms >= 3) {
-            const deposited = Context.attachedDeposit;
-            if (!this.isHalfNear(deposited)) {
-                return null;
-            }
-            this.outcome = u128.sub(this.outcome, deposited);
-        }
-
         const new_form = new Form(title, description, type);
         new_form.save();
         this.forms_owner.add(new_form.get_id());
@@ -205,6 +196,7 @@ class User {
         event_type: EVENT_TYPE,
         start_date: u64,
         end_date: u64,
+        url: string,
     ): string | null {
         const deposit = Context.attachedDeposit;
         const sender = Context.sender;
@@ -219,11 +211,17 @@ class User {
             ContractPromiseBatch.create(sender).transfer(refund_amount);
         }
 
-        const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
+        const newEvent = new Event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
         newEvent.save();
         this.events_owner.add(newEvent.get_id());
+        let event_id: string = newEvent.get_id();
+        this.recent_event_created = event_id;
         this.save();
-        return newEvent.get_id();
+        return event_id;
+    }
+
+    get_recent_event_created(): string {
+        return this.recent_event_created;
     }
 
     join_event(eventId: string): bool {
@@ -255,7 +253,7 @@ class User {
             this.events_joined.add(existedEvent.get_id());
             this.save();
         }
-
+        UserEventStorage.set(this.id, existedEvent.get_id());
         return join_stt;
     }
 
@@ -282,8 +280,9 @@ class User {
 
         existedEvent.leave_event();
         this.events_owner.delete(eventId);
-
+        this.events_joined.delete(eventId);
         this.save();
+        UserEventStorage.delete(this.id, existedEvent.get_id());
         return true;
     }
 

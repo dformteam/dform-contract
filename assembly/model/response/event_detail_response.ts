@@ -20,6 +20,8 @@ class EventDetailResponse {
         private type: EVENT_TYPE,
         private reg_start_date: u64,
         private reg_end_date: u64,
+        private url: string,
+        private is_published: bool,
     ) {}
 }
 

@@ -1,8 +1,9 @@
-import { Context, logging } from "near-sdk-as";
+import { Context, logging, u128 } from "near-sdk-as";
 import { EVENT_TYPE } from "../model/event.model";
 import { FORM_TYPE } from "../model/form.model";
 import UserDetailResponse from "../model/response/user_detail_response";
 import User from "../model/user.model";
+import { USER_STATUS } from "../model/user.model";
 import { UserStorage } from "../storage/user.storage";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
@@ -31,6 +32,7 @@ export function init_new_event(
     event_type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
+    url: string
 ): string | null {
     if (name == "") {
         return null;
@@ -44,7 +46,17 @@ export function init_new_event(
         user.save();
     }
 
-    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date);
+    return user.create_event(name, location, description, privacy, cover_image, event_type, start_date, end_date, url);
+}
+
+export function get_recent_event_created(): string | null {
+    const sender = Context.sender;
+    let user = UserStorage.get(sender);
+    if (!user) {
+        return null;
+    }
+    return user.get_recent_event_created();
+
 }
 
 export function join_form(formId: string): bool {
@@ -111,9 +123,9 @@ export function leave_event(eventId: string): bool {
 }
 
 export function get_user(userId: string): UserDetailResponse | null {
-    const user = UserStorage.get(userId);
+    let user = UserStorage.get(userId);
     if (user == null) {
-        return null;
+        return new UserDetailResponse(userId, USER_STATUS.ACTIVE, u128.Zero, u128.Zero, 0, 0, 0, 0);
     }
 
     return new UserDetailResponse(
