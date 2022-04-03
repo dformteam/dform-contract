@@ -165,7 +165,9 @@ class Event {
             this.is_published = true;
             BlackListStorage.sets(this.id, black_list);
             WhiteListStorage.sets(this.id, white_list);
-            NewestEventStorage.push(this.id);
+            if (this.event_type !== EVENT_TYPE.MEETING_REQUEST) {
+                NewestEventStorage.push(this.id);
+            }
             this.save();
             return true;
         }
