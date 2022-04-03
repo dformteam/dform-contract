@@ -1,9 +1,12 @@
 import { Context, logging, u128 } from "near-sdk-as";
 import { EVENT_TYPE } from "../model/event.model";
+import Event from "../model/event.model";
 import { FORM_TYPE } from "../model/form.model";
+import Meeting from "../model/meeting.model";
 import UserDetailResponse from "../model/response/user_detail_response";
 import User from "../model/user.model";
 import { USER_STATUS } from "../model/user.model";
+import { MeetingStorage } from "../storage/meeting.storage";
 import { UserStorage } from "../storage/user.storage";
 
 export function init_new_form(title: string, description: string, type: FORM_TYPE): string | null {
@@ -138,4 +141,51 @@ export function get_user(userId: string): UserDetailResponse | null {
         user.get_form_joined_count(),
         user.get_event_joined_count(),
     );
+}
+
+export function request_a_meeting(
+    receiver: string,
+    start_date: u64,
+    end_date: u64,
+    name: string,
+    email: string,
+    description: string): string | null {
+
+    const requestor = Context.sender;
+    let receiverInfo = UserStorage.get(receiver);
+    if (receiverInfo == null) {
+        return null
+    }
+
+    let user = UserStorage.get(requestor);
+    if (user == null) {
+        user = new User();
+        user.save();
+    }
+
+    return user.request_a_meeting(receiver, start_date, end_date, name, email, description);
+}
+
+export function response_meeting_request(meeting_id: string, approve: bool): string | null {
+    let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
+    if (!meetingInfo) {
+        return null
+    }
+    if (Context.sender != meetingInfo.get_receiver()) {
+        return null;
+    }
+    let receiver = UserStorage.get(meetingInfo.get_receiver());
+    let requestor = UserStorage.get(meetingInfo.get_requestor());
+    if (!receiver || !requestor) {
+        return null;
+    }
+    let meetingEvent: Event | null = receiver.response_meeting_request(meeting_id, approve);
+    if (!meetingEvent) {
+        return null;
+    }
+    let reqStt = requestor.join_meeting_event(meetingEvent.get_id())
+    if (!reqStt) {
+        return null;
+    }
+    return meetingEvent.get_id();
 }

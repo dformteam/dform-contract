@@ -4,6 +4,7 @@ import * as Answer from "./controller/answer.controller";
 import * as Participant from "./controller/participant.controller";
 import * as Event from "./controller/event.controller";
 import * as User from "./controller/user.controller";
+import * as Meet from "./controller/meeting.controller";
 
 import { logging, u128 } from "near-sdk-as";
 import { PaginationResult } from "./helper/pagination.helper";
@@ -20,6 +21,7 @@ import { ParticipantFormStatusResponse } from "./model/response/participant_form
 import UserModel from "./model/user.model";
 import EventDetailResponse from "./model/response/event_detail_response";
 import UserDetailResponse from "./model/response/user_detail_response";
+import Meeting from "./model/meeting.model";
 
 //USER
 
@@ -244,4 +246,44 @@ export function unpublish_event(eventId: string): bool {
 
 export function get_event_participants(eventId: string, page: i32): PaginationResult<string> {
     return Event.get_participants(eventId, page);
+}
+
+
+
+export function request_a_meeting(
+    receiver: string,
+    start_date: u64,
+    end_date: u64,
+    name: string,
+    email: string,
+    description: string): string | null {
+    return User.request_a_meeting(receiver, start_date, end_date, name, email, description);
+}
+
+export function response_meeting_request(id: string, approve: bool): string | null {
+    return User.response_meeting_request(id, approve);
+}
+
+export function get_meeting(id: string): Meeting | null {
+    return Meet.get_meeting(id);
+}
+
+export function cancel_meeting_request(id: string): string | null {
+    return Meet.cancel_meeting_request(id);
+}
+
+export function get_pending_requests(userId: string, page: i32):PaginationResult<Meeting> {
+    return Meet.get_pending_requests(userId, page);
+}
+
+export function get_pending_requests_count(userId: string): i32 {
+    return Meet.get_pending_requests_count(userId);
+}
+
+export function get_meeting_requests(userId: string, page: i32):PaginationResult<Meeting> {
+    return Meet.get_meeting_requests(userId, page);
+}
+
+export function get_meeting_requests_count(userId: string): i32 {
+    return Meet.get_meeting_requests_count(userId);
 }

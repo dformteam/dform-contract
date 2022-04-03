@@ -10,6 +10,7 @@ export enum EVENT_TYPE {
     ONLINE,
     INPERSON,
     ONLINE_AND_INPERSON,
+    MEETING_REQUEST
 }
 
 export enum PUBLIC_PARTICIPANT_TYPE {
@@ -231,9 +232,11 @@ class Event {
         return false;
     }
 
-    join(): bool {
-        const sender = Context.sender;
-
+    join(user_id: string = ''): bool {
+        let sender = Context.sender;
+        if (this.event_type == EVENT_TYPE.MEETING_REQUEST) {
+            sender = user_id;
+        }
         if (!this.participants.has(sender)) {
             const is_in_white_list = WhiteListStorage.contains(this.id, sender);
             const is_in_black_list = BlackListStorage.contains(this.id, sender);

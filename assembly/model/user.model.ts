@@ -10,6 +10,8 @@ import Event from "./event.model";
 import { FORM_TYPE } from "./form.model";
 import Form from "./form.model";
 import { ParticipantFormResponse } from "./response/participant_form";
+import Meeting from "./meeting.model";
+import { MeetingStorage, UserMeetingRequestStorage, UserPendingRequestStorage } from "../storage/meeting.storage";
 
 export enum USER_STATUS {
     ACTIVE,
@@ -33,6 +35,8 @@ class User {
     private forms_joined: Set<string>;
     private events_joined: Set<string>;
     private recent_event_created: string;
+    private meeting_request: Set<string>;
+    private pending_request: Set<string>;
 
     constructor() {
         this.id = Context.sender;
@@ -54,6 +58,14 @@ class User {
 
         if (this.events_joined == null) {
             this.events_joined = new Set<string>();
+        }
+
+        if (this.meeting_request == null) {
+            this.meeting_request = new Set<string>();
+        }
+
+        if (this.pending_request == null) {
+            this.pending_request = new Set<string>();
         }
     }
 
@@ -220,6 +232,65 @@ class User {
         return event_id;
     }
 
+    request_a_meeting(
+        receiver: string,
+        start_date: u64,
+        end_date: u64,
+        name: string,
+        email: string,
+        description: string): string | null {
+        let receiverInfo = UserStorage.get(receiver)
+        if (receiverInfo) {
+            let newMeeting = new Meeting(receiver, start_date, end_date, name, email, description);
+            newMeeting.save();
+            UserMeetingRequestStorage.set(this.id, newMeeting.get_id());
+            UserPendingRequestStorage.set(receiver, newMeeting.get_id());
+            return newMeeting.get_id();
+        }
+        return null;
+    }
+
+    response_meeting_request(meeting_id: string, approve: bool): Event | null {
+        let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
+        if (meetingInfo && approve) {
+            let meetingDes: Set<string> = new Set<string>();
+            let privacy: Set<string> = new Set<string>();
+            let black_list: Set<string> = new Set<string>();
+            let white_list: Set<string> = new Set<string>();
+            meetingDes.add(meetingInfo.get_description());
+            let meetingEvent = new Event(
+                `[Meeting with ${meetingInfo.get_email()}] ${meetingInfo.get_name()}`,
+                '',
+                meetingDes,
+                privacy,
+                '',
+                EVENT_TYPE.MEETING_REQUEST,
+                meetingInfo.get_start_date(),
+                meetingInfo.get_end_date(),
+                '')
+            meetingEvent.save();
+            meetingEvent.publish(
+                0,
+                u128.Zero,
+                meetingInfo.get_start_date(),
+                meetingInfo.get_end_date(),
+                black_list,
+                white_list
+            );
+            meetingEvent.save();
+            UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
+            UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);
+            MeetingStorage.delete(meeting_id);
+            return meetingEvent;
+        }
+        if (meetingInfo && !approve) {
+            UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
+            UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);
+            MeetingStorage.delete(meeting_id);
+        }
+        return null;
+    }
+
     get_recent_event_created(): string {
         return this.recent_event_created;
     }
@@ -253,6 +324,24 @@ class User {
             this.events_joined.add(existedEvent.get_id());
             this.save();
         }
+        UserEventStorage.set(this.id, existedEvent.get_id());
+        return join_stt;
+    }
+
+    join_meeting_event(eventId: string): bool {
+        const existedEvent = EventStorage.get(eventId);
+        if (existedEvent == null) {
+            return false;
+        }
+
+        if (this.events_joined.has(existedEvent.get_id())) {
+            return false;
+        }
+
+        let join_stt: bool = false;
+        join_stt = existedEvent.join(this.id);
+        this.events_joined.add(existedEvent.get_id());
+        this.save();
         UserEventStorage.set(this.id, existedEvent.get_id());
         return join_stt;
     }
