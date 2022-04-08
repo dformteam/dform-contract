@@ -259,7 +259,7 @@ class User {
             let white_list: Set<string> = new Set<string>();
             meetingDes.add(meetingInfo.get_description());
             let meetingEvent = new Event(
-                `[Meeting with ${meetingInfo.get_email()}] ${meetingInfo.get_name()}`,
+                `[Meeting] ${meetingInfo.get_name()}`,
                 '',
                 meetingDes,
                 privacy,
@@ -267,7 +267,7 @@ class User {
                 EVENT_TYPE.MEETING_REQUEST,
                 meetingInfo.get_start_date(),
                 meetingInfo.get_end_date(),
-                '')
+                meetingInfo.get_email())
             meetingEvent.save();
             meetingEvent.publish(
                 0,
