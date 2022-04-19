@@ -1,6 +1,6 @@
 near call xtest1.testnet init_new_form '{"title": "test_dep", "description":"formtest", "type": 0}' --account-id xtest1.testnet --gas=300000000000000
 near view xtest1.testnet get_user '{"userId": "xtest1.testnet"}' --account-id xtest1.testnet
-NEAR_ENV=production near view mtoan2193.near get_form '{"id": "ZCcxPVYSijKvpX7m2ATWMf5anTzFDQL9UWtuvSNX71wyB"}' --account-id mtoan2193.near
+NEAR_ENV=production near view mtoan2193.near get_form '{"id": "ZCcxPVYSijKvpX7m2ATWMf5b9nTic42dzXFEiR4fYGvE8"}' --account-id mtoan2193.near
 near view xtest1.testnet get_forms_count '{}' --account-id xtest1.testnet
 near view xtest1.testnet get_participants_count '{}' --account-id xtest1.testnet
 near call xtest1.testnet new_element '{"formId": "cnPNVXsrQbdiCtvpZZrRvimgNzefr2uYi4imJUUaFKoYe", "type": 2, "title": ["q_test2222332254_ggg33_vvbbv"], "meta": ["123123", "3123123"], "isRequired": false, "numth": 0}' --account-id xtest1.testnet --gas=300000000000000
