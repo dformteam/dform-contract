@@ -1,5 +1,9 @@
 near call xtest1.testnet init_new_form '{"title": "test_dep", "description":"formtest", "type": 0}' --account-id xtest1.testnet --gas=300000000000000
-near view xtest1.testnet get_user '{"userId": "xtest6.testnet"}' --account-id xtest1.testnet
+near view neutrino.testnet get_user '{"userId": "xtest1.testnet"}' --account-id xtest1.testnet
+near view neutrino.testnet get_meeting_fee '{"userId": "xtest1.testnet"}' --account-id xtest1.testnet
+near call neutrino.testnet update_calendar_setting '{"meeting_fee": "1000000000000000000000000"}' --account-id xtest1.testnet
+
+
 near view xtest1.testnet get_form '{"id": "cnPNVXsrQbdiCtvpZZrRvimgNzeJXK7tbZyJ2xUsYLpUN"}' --account-id xtest3.testnet
 near view xtest1.testnet get_forms_count '{}' --account-id xtest1.testnet
 near view xtest1.testnet get_participants_count '{}' --account-id xtest1.testnet

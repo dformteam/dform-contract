@@ -30,6 +30,7 @@ class User {
     private holding: u128;
     private created_at: u64;
     private last_modify: u64;
+    private meeting_fee: u128;
     private forms_owner: Set<string>;
     private events_owner: Set<string>;
     private forms_joined: Set<string>;
@@ -43,6 +44,7 @@ class User {
         this.income = u128.Zero;
         this.outcome = u128.Zero;
         this.holding = u128.Zero;
+        this.meeting_fee = u128.Zero;
         this.status = USER_STATUS.ACTIVE;
         this.created_at = Context.blockTimestamp / 1000000;
         if (this.forms_owner == null) {
@@ -134,6 +136,20 @@ class User {
 
     get_event_joined_count(): i32 {
         return this.events_joined.size;
+    }
+
+    get_meeting_fee(): u128 {
+        return this.meeting_fee;
+    }
+
+    set_meeting_fee(value: u128): User {
+        if (u128.lt(value, u128.Zero)) {
+            this.meeting_fee = u128.Zero;
+        } else if (u128.ne(value, this.meeting_fee)) {
+            this.meeting_fee = value;
+        }
+
+        return this;
     }
 
     remove_form_joined(form_id: string): void {
@@ -232,14 +248,8 @@ class User {
         return event_id;
     }
 
-    request_a_meeting(
-        receiver: string,
-        start_date: u64,
-        end_date: u64,
-        name: string,
-        email: string,
-        description: string): string | null {
-        let receiverInfo = UserStorage.get(receiver)
+    request_a_meeting(receiver: string, start_date: u64, end_date: u64, name: string, email: string, description: string): string | null {
+        let receiverInfo = UserStorage.get(receiver);
         if (receiverInfo) {
             let newMeeting = new Meeting(receiver, start_date, end_date, name, email, description);
             newMeeting.save();
@@ -260,23 +270,17 @@ class User {
             meetingDes.add(meetingInfo.get_description());
             let meetingEvent = new Event(
                 `[Meeting] ${meetingInfo.get_name()}`,
-                '',
+                "",
                 meetingDes,
                 privacy,
-                '',
+                "",
                 EVENT_TYPE.MEETING_REQUEST,
                 meetingInfo.get_start_date(),
                 meetingInfo.get_end_date(),
-                meetingInfo.get_email())
-            meetingEvent.save();
-            meetingEvent.publish(
-                0,
-                u128.Zero,
-                meetingInfo.get_start_date(),
-                meetingInfo.get_end_date(),
-                black_list,
-                white_list
+                meetingInfo.get_email(),
             );
+            meetingEvent.save();
+            meetingEvent.publish(0, u128.Zero, meetingInfo.get_start_date(), meetingInfo.get_end_date(), black_list, white_list);
             meetingEvent.save();
             UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
             UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);

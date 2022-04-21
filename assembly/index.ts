@@ -46,7 +46,7 @@ export function init_new_event(
     type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
-    url: string
+    url: string,
 ): string | null {
     return User.init_new_event(title, location, description, privacy, cover_image, type, start_date, end_date, url);
 }
@@ -151,8 +151,7 @@ export function get_participant_form_status(userId: string, formId: string): Par
     return Participant.get_participant_form_status(userId, formId);
 }
 
-export function test(title: Set<string>): void {
-}
+export function test(title: Set<string>): void {}
 
 export function get_event(eventId: string): EventDetailResponse | null {
     return Event.get_event(eventId);
@@ -191,7 +190,7 @@ export function update_event_info(
     start_date: u64,
     end_date: u64,
     type: EVENT_TYPE,
-    url: string
+    url: string,
 ): EventModel | null {
     return Event.update_event_info(eventId, title, description, location, cover_img, start_date, end_date, type, url);
 }
@@ -248,15 +247,7 @@ export function get_event_participants(eventId: string, page: i32): PaginationRe
     return Event.get_participants(eventId, page);
 }
 
-
-
-export function request_a_meeting(
-    receiver: string,
-    start_date: u64,
-    end_date: u64,
-    name: string,
-    email: string,
-    description: string): string | null {
+export function request_a_meeting(receiver: string, start_date: u64, end_date: u64, name: string, email: string, description: string): string | null {
     return User.request_a_meeting(receiver, start_date, end_date, name, email, description);
 }
 
@@ -272,7 +263,7 @@ export function cancel_meeting_request(id: string): string | null {
     return Meet.cancel_meeting_request(id);
 }
 
-export function get_pending_requests(userId: string, page: i32):PaginationResult<Meeting> {
+export function get_pending_requests(userId: string, page: i32): PaginationResult<Meeting> {
     return Meet.get_pending_requests(userId, page);
 }
 
@@ -280,10 +271,18 @@ export function get_pending_requests_count(userId: string): i32 {
     return Meet.get_pending_requests_count(userId);
 }
 
-export function get_meeting_requests(userId: string, page: i32):PaginationResult<Meeting> {
+export function get_meeting_requests(userId: string, page: i32): PaginationResult<Meeting> {
     return Meet.get_meeting_requests(userId, page);
 }
 
 export function get_meeting_requests_count(userId: string): i32 {
     return Meet.get_meeting_requests_count(userId);
+}
+
+export function update_calendar_setting(meeting_fee: u128): bool {
+    return User.update_calendar_setting(meeting_fee);
+}
+
+export function get_meeting_fee(userId: string): u128 {
+    return User.get_meeting_fee(userId);
 }

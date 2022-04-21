@@ -35,7 +35,7 @@ export function init_new_event(
     event_type: EVENT_TYPE,
     start_date: u64,
     end_date: u64,
-    url: string
+    url: string,
 ): string | null {
     if (name == "") {
         return null;
@@ -59,7 +59,6 @@ export function get_recent_event_created(): string | null {
         return null;
     }
     return user.get_recent_event_created();
-
 }
 
 export function join_form(formId: string): bool {
@@ -143,18 +142,11 @@ export function get_user(userId: string): UserDetailResponse | null {
     );
 }
 
-export function request_a_meeting(
-    receiver: string,
-    start_date: u64,
-    end_date: u64,
-    name: string,
-    email: string,
-    description: string): string | null {
-
+export function request_a_meeting(receiver: string, start_date: u64, end_date: u64, name: string, email: string, description: string): string | null {
     const requestor = Context.sender;
     let receiverInfo = UserStorage.get(receiver);
     if (receiverInfo == null) {
-        return null
+        return null;
     }
 
     let user = UserStorage.get(requestor);
@@ -169,7 +161,7 @@ export function request_a_meeting(
 export function response_meeting_request(meeting_id: string, approve: bool): string | null {
     let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
     if (!meetingInfo) {
-        return null
+        return null;
     }
     if (Context.sender != meetingInfo.get_receiver()) {
         return null;
@@ -183,9 +175,30 @@ export function response_meeting_request(meeting_id: string, approve: bool): str
     if (!meetingEvent) {
         return null;
     }
-    let reqStt = requestor.join_meeting_event(meetingEvent.get_id())
+    let reqStt = requestor.join_meeting_event(meetingEvent.get_id());
     if (!reqStt) {
         return null;
     }
     return meetingEvent.get_id();
+}
+
+export function update_calendar_setting(meeting_fee: u128): bool {
+    const sender = Context.sender;
+
+    let user = UserStorage.get(sender);
+    if (user == null) {
+        user = new User();
+    }
+
+    user.set_meeting_fee(meeting_fee).save();
+    return true;
+}
+
+export function get_meeting_fee(userId: string): u128 {
+    let user = UserStorage.get(userId);
+    if (user == null) {
+        return u128.Zero;
+    }
+
+    return user.get_meeting_fee();
 }
