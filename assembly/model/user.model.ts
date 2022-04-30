@@ -38,6 +38,7 @@ class User {
     private recent_event_created: string;
     private meeting_request: Set<string>;
     private pending_request: Set<string>;
+    private available_time: string;
 
     constructor() {
         this.id = Context.sender;
@@ -140,6 +141,16 @@ class User {
 
     get_meeting_fee(): u128 {
         return this.meeting_fee;
+    }
+
+    get_available_time(): string {
+        return this.available_time;
+    }
+
+    set_available_time(time_b64: string): User {
+        this.available_time = time_b64;
+        this.save();
+        return this;
     }
 
     set_meeting_fee(value: u128): User {

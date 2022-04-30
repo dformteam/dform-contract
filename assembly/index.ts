@@ -283,6 +283,10 @@ export function update_calendar_setting(meeting_fee: u128): bool {
     return User.update_calendar_setting(meeting_fee);
 }
 
-export function get_meeting_fee(userId: string): u128 {
-    return User.get_meeting_fee(userId);
+export function get_available_time(userId: string): string | null {
+    return User.get_available_time(userId);
+}
+
+export function set_available_time(time_b64: string): bool {
+    return User.set_available_time(time_b64);
 }

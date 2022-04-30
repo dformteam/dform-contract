@@ -84,7 +84,7 @@ near call neutrino.testnet leave_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCX
 near call neutrino.testnet check_event_join_permission '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49oGf9xhdPE615LdKLfKzTgr\"}' --account-id neutrino.testnet
 
 near call neutrino.testnet delete_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49oXBM7eXVoT8CSRJe2PtyRr\"}' --account-id gefi_hub.testnet
-near call neutrino.testnet get_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49oXBM7Zbqc9zJAB1dddwpLQ\"}' --account-id gefi_hub.testnet
+near call neutrino.testnet get_event '{\"eventId\": \"GEZdGLxjyTURva6V9TzkwuCXswxmhPnQ49oXBM7jF9BxoTYHACH6emp8\"}' --account-id gefi_hub.testnet
 
 
 near call neutrino.testnet request_a_meeting '{\"receiver\": \"gefi_hub.testnet\", \"start_date\": \"1648892445004\", \"end_date\": \"1648899445004\", \"name\": \"Meeting\" ,\"email\": \"neutrino@gmail.com\" ,\"description\": \"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
@@ -93,3 +93,7 @@ near call neutrino.testnet get_meeting '{\"id\": \"7Eae8dbzjJob5cx3G1oV4RbaN4BSW
 near call neutrino.testnet cancel_meeting_request '{\"id\": \"7Eae8FXLFq5NEuU5T7B3BvfBM96dcWRx6ZJGWSyaDGt8V6Wxs7qoM5uY4BNhjxBvFTy9vj7Yms\"}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet get_pending_requests '{\"userId\": \"neutrino.testnet\", \"page\": 1}' --account-id neutrino.testnet --gas=300000000000000
 near call neutrino.testnet get_pending_requests_count '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet set_available_time '{\"time_b64\": \"e30=\"}' --account-id neutrino.testnet --gas=300000000000000
+near call neutrino.testnet get_available_time '{\"userId\": \"neutrino.testnet\"}' --account-id neutrino.testnet --gas=300000000000000
+
+

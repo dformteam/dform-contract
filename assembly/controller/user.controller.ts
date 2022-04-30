@@ -202,3 +202,25 @@ export function get_meeting_fee(userId: string): u128 {
 
     return user.get_meeting_fee();
 }
+
+export function get_available_time(userId: string): string | null {
+    let user = UserStorage.get(userId);
+    if (user == null) {
+        return null;
+    }
+
+    return user.get_available_time();
+}
+
+export function set_available_time(time_b64: string): bool {
+    const sender = Context.sender;
+
+    let user = UserStorage.get(sender);
+    if (user == null) {
+        user = new User();
+    }
+
+    user.set_available_time(time_b64);
+    return true;
+}
+
