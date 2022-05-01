@@ -151,7 +151,7 @@ export function get_participant_form_status(userId: string, formId: string): Par
     return Participant.get_participant_form_status(userId, formId);
 }
 
-export function test(title: Set<string>): void {}
+export function test(title: Set<string>): void { }
 
 export function get_event(eventId: string): EventDetailResponse | null {
     return Event.get_event(eventId);
@@ -279,8 +279,8 @@ export function get_meeting_requests_count(userId: string): i32 {
     return Meet.get_meeting_requests_count(userId);
 }
 
-export function update_calendar_setting(meeting_fee: u128): bool {
-    return User.update_calendar_setting(meeting_fee);
+export function update_calendar_setting(meeting_fee: u128, available_time: string): bool {
+    return User.update_calendar_setting(meeting_fee, available_time);
 }
 
 export function get_available_time(userId: string): string | null {
@@ -289,4 +289,8 @@ export function get_available_time(userId: string): string | null {
 
 export function set_available_time(time_b64: string): bool {
     return User.set_available_time(time_b64);
+}
+
+export function get_meeting_fee(userId: string): u128 {
+    return User.get_meeting_fee(userId);
 }

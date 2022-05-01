@@ -182,15 +182,16 @@ export function response_meeting_request(meeting_id: string, approve: bool): str
     return meetingEvent.get_id();
 }
 
-export function update_calendar_setting(meeting_fee: u128): bool {
+export function update_calendar_setting(meeting_fee: u128, available_time: string): bool {
     const sender = Context.sender;
 
     let user = UserStorage.get(sender);
     if (user == null) {
         user = new User();
     }
-
-    user.set_meeting_fee(meeting_fee).save();
+    user.set_meeting_fee(meeting_fee);
+    user.set_available_time(available_time);
+    user.save();
     return true;
 }
 
