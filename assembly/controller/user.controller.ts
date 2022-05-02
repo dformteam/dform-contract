@@ -149,38 +149,47 @@ export function request_a_meeting(receiver: string, start_date: u64, end_date: u
         return null;
     }
 
-    let user = UserStorage.get(requestor);
-    if (user == null) {
-        user = new User();
-        user.save();
+    let requestorInfo = UserStorage.get(requestor);
+    if (requestorInfo == null) {
+        requestorInfo = new User();
+        requestorInfo.save();
     }
 
-    return user.request_a_meeting(receiver, start_date, end_date, name, email, description);
+    let meetingInfo: Meeting | null = requestorInfo.request_a_meeting(receiver, start_date, end_date, name, email, description);
+    if (meetingInfo && receiverInfo) {
+        let meeting_fee = receiverInfo.get_meeting_fee();
+        let meetingEvent: Event | null = receiverInfo.response_meeting_request(meetingInfo, meeting_fee);
+        if (meetingEvent && requestorInfo.join_event(meetingEvent.get_id())) {
+            return meetingEvent.get_id();
+        }
+    }
+
+    return null;
 }
 
-export function response_meeting_request(meeting_id: string, approve: bool): string | null {
-    let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
-    if (!meetingInfo) {
-        return null;
-    }
-    if (Context.sender != meetingInfo.get_receiver()) {
-        return null;
-    }
-    let receiver = UserStorage.get(meetingInfo.get_receiver());
-    let requestor = UserStorage.get(meetingInfo.get_requestor());
-    if (!receiver || !requestor) {
-        return null;
-    }
-    let meetingEvent: Event | null = receiver.response_meeting_request(meeting_id, approve);
-    if (!meetingEvent) {
-        return null;
-    }
-    let reqStt = requestor.join_meeting_event(meetingEvent.get_id());
-    if (!reqStt) {
-        return null;
-    }
-    return meetingEvent.get_id();
-}
+// export function response_meeting_request(meeting_id: string, enroll_fee: u128): string | null {
+//     let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
+//     if (!meetingInfo) {
+//         return null;
+//     }
+//     if (Context.sender != meetingInfo.get_receiver()) {
+//         return null;
+//     }
+//     let receiver = UserStorage.get(meetingInfo.get_receiver());
+//     let requestor = UserStorage.get(meetingInfo.get_requestor());
+//     if (!receiver || !requestor) {
+//         return null;
+//     }
+    // let meetingEvent: Event | null = receiver.response_meeting_request(meeting_id, enroll_fee);
+    // if (!meetingEvent) {
+    //     return null;
+    // }
+//     let reqStt = requestor.join_meeting_event(meetingEvent.get_id());
+//     if (!reqStt) {
+//         return null;
+//     }
+//     return meetingEvent.get_id();
+// }
 
 export function update_calendar_setting(meeting_fee: u128, available_time: string): bool {
     const sender = Context.sender;

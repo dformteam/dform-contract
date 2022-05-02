@@ -259,21 +259,21 @@ class User {
         return event_id;
     }
 
-    request_a_meeting(receiver: string, start_date: u64, end_date: u64, name: string, email: string, description: string): string | null {
+    request_a_meeting(receiver: string, start_date: u64, end_date: u64, name: string, email: string, description: string): Meeting | null {
         let receiverInfo = UserStorage.get(receiver);
         if (receiverInfo) {
-            let newMeeting = new Meeting(receiver, start_date, end_date, name, email, description);
-            newMeeting.save();
-            UserMeetingRequestStorage.set(this.id, newMeeting.get_id());
-            UserPendingRequestStorage.set(receiver, newMeeting.get_id());
-            return newMeeting.get_id();
+            // let newMeeting = new Meeting(receiver, start_date, end_date, name, email, description);
+            // newMeeting.save();
+            // UserMeetingRequestStorage.set(this.id, newMeeting.get_id());
+            // UserPendingRequestStorage.set(receiver, newMeeting.get_id());
+            // return newMeeting;
+            return new Meeting(receiver, start_date, end_date, name, email, description);
         }
         return null;
     }
 
-    response_meeting_request(meeting_id: string, approve: bool): Event | null {
-        let meetingInfo: Meeting | null = MeetingStorage.get(meeting_id);
-        if (meetingInfo && approve) {
+    response_meeting_request(meetingInfo: Meeting, enroll_fee: u128): Event | null {
+        if (meetingInfo) {
             let meetingDes: Set<string> = new Set<string>();
             let privacy: Set<string> = new Set<string>();
             let black_list: Set<string> = new Set<string>();
@@ -289,19 +289,15 @@ class User {
                 meetingInfo.get_start_date(),
                 meetingInfo.get_end_date(),
                 meetingInfo.get_email(),
+                meetingInfo.get_receiver()
             );
             meetingEvent.save();
-            meetingEvent.publish(0, u128.Zero, meetingInfo.get_start_date(), meetingInfo.get_end_date(), black_list, white_list);
+            meetingEvent.publish(0, enroll_fee, meetingInfo.get_start_date(), meetingInfo.get_end_date(), black_list, white_list);
             meetingEvent.save();
-            UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
-            UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);
-            MeetingStorage.delete(meeting_id);
+            // UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
+            // UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);
+            // MeetingStorage.delete(meeting_id);
             return meetingEvent;
-        }
-        if (meetingInfo && !approve) {
-            UserMeetingRequestStorage.delete(meetingInfo.get_requestor(), meeting_id);
-            UserPendingRequestStorage.delete(meetingInfo.get_receiver(), meeting_id);
-            MeetingStorage.delete(meeting_id);
         }
         return null;
     }

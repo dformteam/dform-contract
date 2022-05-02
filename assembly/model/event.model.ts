@@ -49,10 +49,15 @@ class Event {
         private event_type: EVENT_TYPE,
         private start_date: u64,
         private end_date: u64,
-        private url: string
+        private url: string,
+        private another_owner: string = ''
     ) {
         this.created_at = Context.blockTimestamp / 1000000;
-        this.owner = Context.sender;
+        if (this.another_owner !== '') {
+            this.owner = this.another_owner;
+        } else {
+            this.owner = Context.sender;
+        }
         this.status = EVENT_STATUS.EDITING;
         this.enroll_fee = u128.Zero;
 
