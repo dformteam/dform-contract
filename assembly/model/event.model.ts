@@ -40,6 +40,7 @@ class Event {
     private register_end_date: u64;
     private status: EVENT_STATUS;
     private is_published: bool = false;
+    private is_claimed: bool = false;
     constructor(
         private name: string,
         private location: string,
@@ -194,7 +195,10 @@ class Event {
             for (let i = 0; i < participant_length; i++) {
                 const user = UserStorage.get(participants[i]);
                 if (user !== null) {
-                    ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
+                    // ContractPromiseBatch.create(participants[i]).transfer(this.enroll_fee);
+                    let promise = ContractPromiseBatch.create(participants[i]);
+                    if (!promise) return false;
+                    promise.transfer(this.enroll_fee);
                     user.remove_event_joined(this.id);
                 }
             }
@@ -229,6 +233,10 @@ class Event {
         return false;
     }
 
+    get_claimed_status(): bool {
+        return this.is_claimed;
+    }
+
     not_interest(): bool {
         const sender = Context.sender;
         if (this.interests.has(sender)) {
@@ -239,11 +247,8 @@ class Event {
         return false;
     }
 
-    join(user_id: string = ''): bool {
+    join(): bool {
         let sender = Context.sender;
-        if (this.event_type == EVENT_TYPE.MEETING_REQUEST) {
-            sender = user_id;
-        }
         if (!this.participants.has(sender)) {
             const is_in_white_list = WhiteListStorage.contains(this.id, sender);
             const is_in_black_list = BlackListStorage.contains(this.id, sender);
@@ -270,9 +275,11 @@ class Event {
         const currentTimestamp = Context.blockTimestamp / 1000000;
         if (this.status === EVENT_STATUS.STARTING && currentTimestamp < this.register_end_date) {
             if (this.participants.has(sender)) {
-                //TODO: need to refund
                 const refund_amount = u128.div(u128.mul(this.enroll_fee, u128.from("90")), u128.from("100"));
-                ContractPromiseBatch.create(sender).transfer(refund_amount);
+                // ContractPromiseBatch.create(sender).transfer(refund_amount);
+                let promise = ContractPromiseBatch.create(sender);
+                if (!promise) return false;
+                promise.transfer(refund_amount);
                 this.participants.delete(sender);
                 this.save();
                 return true;
@@ -370,6 +377,32 @@ class Event {
         }
 
         return new PaginationResult(page, participant_length, result.values());
+    }
+
+    claim_reward(): u128 {
+        const sender = Context.sender;
+        if ((Context.blockTimestamp / 1000000 >= this.end_date) && (!this.is_claimed) && (sender == this.owner)) {
+            const total_value: u128 = u128.mul(this.enroll_fee, u128.from(this.participants.size));
+            // Get 10% fee
+            const claim_value: u128 = u128.div(u128.mul(total_value, u128.from("90")), u128.from("100"));
+            let promise = ContractPromiseBatch.create(this.owner);
+            if (!promise) return u128.Zero;
+            promise.transfer(claim_value);
+            this.is_claimed = true;
+            this.save();
+            return claim_value;
+        }
+        return u128.Zero;
+    }
+
+    get_claimable_amount(): u128 {
+        const sender = Context.sender;
+        if ((!this.is_claimed) && (sender == this.owner)) {
+            const total_value: u128 = u128.mul(this.enroll_fee, u128.from(this.participants.size));
+            const claim_value: u128 = u128.div(u128.mul(total_value, u128.from("90")), u128.from("100"));
+            return claim_value;
+        }
+        return u128.Zero
     }
 
     remove(): void {

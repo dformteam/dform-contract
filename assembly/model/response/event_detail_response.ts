@@ -22,6 +22,7 @@ class EventDetailResponse {
         private reg_end_date: u64,
         private url: string,
         private is_published: bool,
+        private is_claimed: bool,
     ) {}
 }
 

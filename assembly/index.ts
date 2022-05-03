@@ -259,9 +259,9 @@ export function request_a_meeting(receiver: string, start_date: u64, end_date: u
 //     return Meet.get_meeting(id);
 // }
 
-export function cancel_meeting_request(id: string): string | null {
-    return Meet.cancel_meeting_request(id);
-}
+// export function cancel_meeting_request(id: string): string | null {
+//     return Meet.cancel_meeting_request(id);
+// }
 
 // export function get_pending_requests(userId: string, page: i32): PaginationResult<Meeting> {
 //     return Meet.get_pending_requests(userId, page);
@@ -293,4 +293,12 @@ export function set_available_time(time_b64: string): bool {
 
 export function get_meeting_fee(userId: string): u128 {
     return User.get_meeting_fee(userId);
+}
+
+export function claim_event_reward(eventId: string): u128 {
+    return Event.claim_reward(eventId);
+}
+
+export function get_claimable_amount(eventId: string): u128 {
+    return Event.get_claimable_amount(eventId);
 }

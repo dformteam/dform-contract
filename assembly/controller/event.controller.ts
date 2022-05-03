@@ -31,6 +31,7 @@ export function get_event(eventId: string): EventDetailResponse | null {
         event.get_register_end_date(),
         event.get_public_url(),
         event.get_publish_status(),
+        event.get_claimed_status()
     );
 }
 
@@ -54,7 +55,6 @@ export function check_event_join_permission(eventId: string): bool {
 export function get_events(userId: string, page: i32): PaginationResult<Event> {
     return UserEventStorage.gets(userId, page);
 }
-
 
 export function update_event_info(
     eventId: string,
@@ -194,4 +194,24 @@ export function get_newest_events(page: i32): PaginationResult<Event> {
 
 export function get_newest_events_count(): i32 {
     return NewestEventStorage.count();
+}
+
+export function claim_reward(eventId: string): u128 {
+    const existedEvent = EventStorage.get(eventId);
+    const sender = Context.sender;
+    if (existedEvent == null || existedEvent.get_owner() != sender) {
+        return u128.Zero;
+    }
+
+    return existedEvent.claim_reward();
+}
+
+export function get_claimable_amount(eventId: string): u128 {
+    const existedEvent = EventStorage.get(eventId);
+    const sender = Context.sender;
+    if (existedEvent == null || existedEvent.get_owner() != sender) {
+        return u128.Zero;
+    }
+
+    return existedEvent.get_claimable_amount();
 }

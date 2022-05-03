@@ -339,23 +339,23 @@ class User {
         return join_stt;
     }
 
-    join_meeting_event(eventId: string): bool {
-        const existedEvent = EventStorage.get(eventId);
-        if (existedEvent == null) {
-            return false;
-        }
+    // join_meeting_event(eventId: string): bool {
+    //     const existedEvent = EventStorage.get(eventId);
+    //     if (existedEvent == null) {
+    //         return false;
+    //     }
 
-        if (this.events_joined.has(existedEvent.get_id())) {
-            return false;
-        }
+    //     if (this.events_joined.has(existedEvent.get_id())) {
+    //         return false;
+    //     }
 
-        let join_stt: bool = false;
-        join_stt = existedEvent.join(this.id);
-        this.events_joined.add(existedEvent.get_id());
-        this.save();
-        UserEventStorage.set(this.id, existedEvent.get_id());
-        return join_stt;
-    }
+    //     let join_stt: bool = false;
+    //     join_stt = existedEvent.join(this.id);
+    //     this.events_joined.add(existedEvent.get_id());
+    //     this.save();
+    //     UserEventStorage.set(this.id, existedEvent.get_id());
+    //     return join_stt;
+    // }
 
     delete_event(eventId: string): bool {
         const existedEvent = EventStorage.get(eventId);
