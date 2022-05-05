@@ -302,3 +302,7 @@ export function claim_event_reward(eventId: string): u128 {
 export function get_claimable_amount(eventId: string): u128 {
     return Event.get_claimable_amount(eventId);
 }
+
+export function reschedule_meeting(eventId: string, start_date: u64, end_date: u64): bool {
+    return Event.reschedule_meeting(eventId, start_date, end_date);
+}

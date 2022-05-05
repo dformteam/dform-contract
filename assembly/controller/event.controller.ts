@@ -215,3 +215,20 @@ export function get_claimable_amount(eventId: string): u128 {
 
     return existedEvent.get_claimable_amount();
 }
+
+export function reschedule_meeting(eventId: string, start_date: u64, end_date: u64): bool {
+    const existedEvent = EventStorage.get(eventId);
+    const sender = Context.sender;
+    if (existedEvent == null || existedEvent.get_owner() != sender) {
+        return false;
+    }
+
+    if (existedEvent.get_type() !== EVENT_TYPE.MEETING_REQUEST) {
+        return false;
+    }
+
+    existedEvent.set_start_date(start_date);
+    existedEvent.set_end_date(end_date);
+    existedEvent.save();
+    return true;
+}
