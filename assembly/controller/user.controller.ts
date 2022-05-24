@@ -146,7 +146,8 @@ export function request_a_meeting(receiver: string, start_date: u64, end_date: u
     const requestor = Context.sender;
     let receiverInfo = UserStorage.get(receiver);
     if (receiverInfo == null) {
-        return null;
+        receiverInfo = new User();
+        receiverInfo.save();
     }
 
     let requestorInfo = UserStorage.get(requestor);
@@ -180,10 +181,10 @@ export function request_a_meeting(receiver: string, start_date: u64, end_date: u
 //     if (!receiver || !requestor) {
 //         return null;
 //     }
-    // let meetingEvent: Event | null = receiver.response_meeting_request(meeting_id, enroll_fee);
-    // if (!meetingEvent) {
-    //     return null;
-    // }
+// let meetingEvent: Event | null = receiver.response_meeting_request(meeting_id, enroll_fee);
+// if (!meetingEvent) {
+//     return null;
+// }
 //     let reqStt = requestor.join_meeting_event(meetingEvent.get_id());
 //     if (!reqStt) {
 //         return null;

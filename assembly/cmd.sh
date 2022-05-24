@@ -98,3 +98,5 @@ near call neutrino.testnet get_available_time '{\"userId\": \"neutrino.testnet\"
 near view neutrino.testnet get_meeting_fee '{\"userId\": \"gefi_match.testnet\"}' --account-id neutrino.testnet  
 near call neutrino.testnet claim_event_reward '{\"eventId\": \"67nBhHSqcPxsagz5vCQLiRJAekV9cRKActZjvrr1dcXmKHzYcD7owQS7NJ3\"}' --account-id gefi_match.testnet
 near call neutrino.testnet get_claimable_amount '{\"eventId\": \"67nBhHSqcPxsagz5vCQLiRJAekV9cRKActZjvrr1dcXmKHzYcD7owQS7NJ3\"}' --account-id gefi_match.testnet
+
+near call neutrino.testnet request_a_meeting '{\"receiver\": \"dsuite12.testnet\", \"start_date\": \"1653625800000\", \"end_date\": \"1653627600000\", \"name\": \"Meetingasaaas\" ,\"receiver\": \"dsuite12.testnet\", \"email\": \"dsuite12@dss\" ,\"description\": \"dsuite12.testnetdsuite12.testnetdsuite12.testnet\"}' --account-id hieutest1.testnet --gas=300000000000000
