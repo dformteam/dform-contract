@@ -40,8 +40,13 @@ class User {
     private pending_request: Set<string>;
     private available_time: string;
 
-    constructor() {
-        this.id = Context.sender;
+    constructor(id: string = Context.sender) {
+        // this.id = Context.sender;
+        if (id !== Context.sender) {
+            this.id = id;
+        } else {
+            this.id = Context.sender;
+        }
         this.income = u128.Zero;
         this.outcome = u128.Zero;
         this.holding = u128.Zero;

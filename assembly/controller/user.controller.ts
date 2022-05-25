@@ -146,7 +146,7 @@ export function request_a_meeting(receiver: string, start_date: u64, end_date: u
     const requestor = Context.sender;
     let receiverInfo = UserStorage.get(receiver);
     if (receiverInfo == null) {
-        receiverInfo = new User();
+        receiverInfo = new User(receiver);
         receiverInfo.save();
     }
 
