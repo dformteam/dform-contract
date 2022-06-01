@@ -19,8 +19,10 @@ export enum USER_STATUS {
 }
 
 export const OVER_CREATE_FORM_FEE = "500000000000000000000000";
-export const CREATE_EVENT_COST = "10000000000000000000"; // 1 NEAR
+export const CREATE_MEETING_COST = "1000000000000000000000000"; // 1 NEAR
 export const JOIN_EVENT_COST = "100000000000000000"; // 0.01 NEAR
+export const CREATE_EVENT_COST = "10000000000000000000";
+
 @nearBindgen
 class User {
     private id: string;
@@ -50,7 +52,8 @@ class User {
         this.income = u128.Zero;
         this.outcome = u128.Zero;
         this.holding = u128.Zero;
-        this.meeting_fee = u128.Zero;
+        // this.meeting_fee = u128.Zero;
+        this.meeting_fee = u128.from(CREATE_MEETING_COST);
         this.status = USER_STATUS.ACTIVE;
         this.created_at = Context.blockTimestamp / 1000000;
         if (this.forms_owner == null) {

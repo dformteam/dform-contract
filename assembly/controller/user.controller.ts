@@ -208,7 +208,7 @@ export function update_calendar_setting(meeting_fee: u128, available_time: strin
 export function get_meeting_fee(userId: string): u128 {
     let user = UserStorage.get(userId);
     if (user == null) {
-        return u128.Zero;
+        return u128.from('1000000000000000000000000');;
     }
 
     return user.get_meeting_fee();
